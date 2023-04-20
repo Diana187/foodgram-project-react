@@ -14,7 +14,6 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
         'tags',
     )
-    list_per_page = 5
     search_fields = (
         'author',
         'name',
@@ -30,7 +29,6 @@ class IngridientAdmin(admin.ModelAdmin):
     list_filter = (
         'name',
     )
-    list_per_page = 5
     search_fields = (
         'name',
     )
@@ -44,7 +42,6 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = (
         
     )
-    list_per_page = 5
     search_fields = (
         
     )
