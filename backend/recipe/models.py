@@ -15,6 +15,10 @@ class Ingridient(models.Model):
         max_length=200,
     )
 
+    class Meta:
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Ингридиенты'
+
     def __str__(self):
         return f'{self.name} {self.measure}'
 
@@ -37,6 +41,10 @@ class Tag(models.Model):
         verbose_name='Слаг',
         unique=True,
     )
+
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
 
     def __str__(self):
         return self.name
@@ -80,6 +88,15 @@ class Recipe(models.Model):
         help_text='Введите время готовкив минутах',
         default=1,
     )
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True,
+    )
+
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return f'{self.name} {self.author}'
