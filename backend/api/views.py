@@ -1,13 +1,16 @@
 from rest_framework import generics
 
-from api.serializers import IngridientSerializer, RecipeSerializer, TagSerializer
+from api.serializers import (
+    IngredientSerializer, RecipeSerializer, TagSerializer)
 from api.paginators import RecipePagination
-from recipe.models import Ingridient, Recipe, Tag
+from recipe.models import (
+    Favorite, FavoriteShoppingList, Ingredient,
+    RecipeIngredientAmount, Recipe, ShoppingList, Tag)
 
 
-class IngridientApiView(generics.ListAPIView):
-    queryset = Ingridient.objects.all()
-    serializer_class = IngridientSerializer
+class IngredientApiView(generics.ListAPIView):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
 
 
 class RecipeApiView(generics.ListAPIView):
@@ -19,3 +22,23 @@ class RecipeApiView(generics.ListAPIView):
 class TagApiView(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+
+
+class FavoriteApiView(generics.ListAPIView):
+    queryset = Favorite.objects.all()
+    pass
+
+
+class FavoriteShoppingListApiView(generics.ListAPIView):
+    queryset = FavoriteShoppingList.objects.all()
+    pass
+
+
+class IngredientRecipeApiView(generics.ListAPIView):
+    queryset = RecipeIngredientAmount.objects.all()
+    pass
+
+
+class ShoppingListApiView(generics.ListAPIView):
+    queryset = ShoppingList.objects.all()
+    pass

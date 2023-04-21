@@ -5,7 +5,7 @@ from colorfield.fields import ColorField
 from users.models import User
 
 
-class Ingridient(models.Model):
+class Ingredient(models.Model):
     name = models.CharField(
         'Название ингридиента',
         max_length=200,
@@ -90,8 +90,8 @@ class Recipe(models.Model):
         max_length=500,
         help_text='Добавьте описание к рецепту',
     )
-    ingridients = models.ManyToManyField(
-        Ingridient,
+    ingredients = models.ManyToManyField(
+        Ingredient,
         related_name='recipes',
     )
     tags = models.ManyToManyField(
@@ -125,3 +125,79 @@ class Recipe(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.author}'
+
+
+class FavoriteShoppingList(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        related_name="%(app_label)s_%(class)s_related",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_related",
+    )
+
+    class Meta:
+        abstract = True
+        constraints = (
+            models.UniqueConstraint(
+                fields=['recipe', 'user'],
+                name='%(app_label)s_%(class)s_unique',
+                ),
+        )
+    
+    def __str__(self) -> str:
+        return f'{self.user} add {self.recipe} in favorite.'
+
+
+
+class ShoppingList(FavoriteShoppingList.Model):
+
+    class Meta(FavoriteShoppingList.Meta):
+        related_name = 'shopping_list'
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
+
+
+class Favorite(FavoriteShoppingList.Model):
+
+    class Meta(FavoriteShoppingList.Meta):
+        related_name = 'favorites'
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
+
+
+class RecipeIngredientAmount(models.Model):
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='ingredients',
+        verbose_name='Ингридиент',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipes',
+        verbose_name='Рецепт',
+    )
+    amount = models.SmallIntegerField(
+        verbose_name='Количество ингридиентов в рецепте',
+    )
+
+    class Meta:
+        verbose_name = 'Ингредиенты в рецепта'
+        verbose_name_plural = 'Ингредиенты в рецепта'
+        constraints = (
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_ingredient_amount'
+            ),
+        )
+
+    def __str__(self):
+        return f"{self.ingredient} - {self.recipe} {self.amount}"
+

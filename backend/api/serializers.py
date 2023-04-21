@@ -3,7 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from recipe.models import Ingridient, Recipe, Tag
+from recipe.models import Ingredient, Recipe, Tag
 
 
 class Base64ImageField(serializers.ImageField):
@@ -16,10 +16,10 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class IngridientSerializer(serializers.ModelSerializer):
+class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Ingridient
+        model = Ingredient
         fields = ('name',)
 
 
