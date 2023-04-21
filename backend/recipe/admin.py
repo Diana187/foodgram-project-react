@@ -37,11 +37,12 @@ class IngridientAdmin(admin.ModelAdmin):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-         
+         'name',
+         'color',
     )
     list_filter = (
-        
+        'name',
     )
     search_fields = (
-        
+        'name',
     )

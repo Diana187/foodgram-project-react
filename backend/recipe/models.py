@@ -14,6 +14,14 @@ class Ingridient(models.Model):
         'Единицы измерения',
         max_length=200,
     )
+    created = models.DateTimeField(
+        'Добавлен',
+        auto_now_add=True,
+    )
+    updated = models.DateTimeField(
+        'Изменён',
+        auto_now=True,
+    )
 
     class Meta:
         verbose_name = 'Ингридиент'
@@ -40,6 +48,14 @@ class Tag(models.Model):
     slug = models.SlugField(
         verbose_name='Слаг',
         unique=True,
+    )
+    created = models.DateTimeField(
+        'Добавлен',
+        auto_now_add=True,
+    )
+    updated = models.DateTimeField(
+        'Изменён',
+        auto_now=True,
     )
 
     class Meta:
@@ -91,6 +107,15 @@ class Recipe(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
+        db_index=True,
+    )
+    created = models.DateTimeField(
+        'Добавлен',
+        auto_now_add=True,
+    )
+    updated = models.DateTimeField(
+        'Изменён',
+        auto_now=True,
     )
 
     class Meta:
