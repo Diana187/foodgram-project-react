@@ -26,6 +26,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
+        ordering = ('name',)
 
     def __str__(self):
         return f'{self.name} {self.measure}'
@@ -61,6 +62,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -121,7 +123,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('-pub_date',)
+        ordering = ('-pub_date', 'name',)
 
     def __str__(self):
         return f'{self.name} {self.author}'
@@ -154,19 +156,18 @@ class FavoriteShoppingList(models.Model):
         return f'{self.user} add {self.recipe} in favorite.'
 
 
-
-class ShoppingList(FavoriteShoppingList.Model):
+class ShoppingList(FavoriteShoppingList):
 
     class Meta(FavoriteShoppingList.Meta):
-        related_name = 'shopping_list'
+        default_related_name = 'shopping_list'
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
 
 
-class Favorite(FavoriteShoppingList.Model):
+class Favorite(FavoriteShoppingList):
 
     class Meta(FavoriteShoppingList.Meta):
-        related_name = 'favorites'
+        default_related_name = 'favorites'
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
 
@@ -189,8 +190,8 @@ class RecipeIngredientAmount(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингредиенты в рецепта'
-        verbose_name_plural = 'Ингредиенты в рецепта'
+        verbose_name = 'Ингредиенты в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецепте'
         constraints = (
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
@@ -199,5 +200,4 @@ class RecipeIngredientAmount(models.Model):
         )
 
     def __str__(self):
-        return f"{self.ingredient} - {self.recipe} {self.amount}"
-
+        return f"{self.ingredient} –– {self.recipe} {self.amount}"

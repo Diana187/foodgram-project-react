@@ -22,6 +22,12 @@ class User(AbstractUser):
         unique=True,
     )
 
+    class Meta:
+        verbose_name='Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ('first_name', 'last_name',)
+
+
     def __str__(self):
         return self.username
 
@@ -31,20 +37,20 @@ class Follow(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='follower',
-        verbose_name='Подписчик'
+        verbose_name='Подписчик',
     )
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following',
-        verbose_name='Подписка'
+        verbose_name='Подписка',
     )
 
     class Meta:
         constraints = (
             models.UniqueConstraint(
                 fields=['user', 'following'],
-                name='unique_followers'
+                name='unique_followers',
             ),
         )
         verbose_name = 'Подписка'

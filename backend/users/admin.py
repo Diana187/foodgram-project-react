@@ -1,16 +1,32 @@
 from django.contrib import admin
 
-from users.models import User
+from users.models import User, Follow
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'username', 'email', 
+        'username',
+        'email', 
     )
     list_filter = (
-        'username', 'email',
+        'username',
+        'email',
     )
-    list_per_page = 5
     search_fields = (
-        'username', 'email',
+        'username',
+        'email',
+    )
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'following',
+    )
+    list_filter = (
+        'user',
+    )
+    search_fields = (
+        'user',
     )
