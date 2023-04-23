@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from recipe.models import Ingredient, Recipe, Tag
 
 
-class IngredientFilter(filters.SearchFilter):
+class IngredientFilter(filters.CharFilter):
     search_param = 'name'
 
     class Meta:
