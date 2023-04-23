@@ -1,9 +1,7 @@
 from django.contrib import admin
-from django.urls import path
-
-from api.views import RecipeApiView
+from django.urls import include, path
 
 urlpatterns = [
+    path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
-    path('api/v1/recipelist/', RecipeApiView.as_view())
 ]

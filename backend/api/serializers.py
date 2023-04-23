@@ -3,6 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
+from users.models import User, Follow
 from recipe.models import Ingredient, Recipe, Tag
 
 
@@ -37,3 +38,10 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('name',)
 
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    pass
+
+
+class CreateRecipeSerialixer(serializers.ModelSerializer):
+    pass
