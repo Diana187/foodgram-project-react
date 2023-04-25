@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from colorfield.fields import ColorField
@@ -8,6 +9,7 @@ from users.models import User
 class Ingredient(models.Model):
     name = models.CharField(
         'Название ингридиента',
+        db_index=True,
         max_length=200,
     )
     measurement_unit = models.CharField(
@@ -35,16 +37,16 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     name = models.CharField(
         'Название тега',
+        db_index=True,
         max_length=200,
-        unique=True
+        unique=True,
     )
     color = ColorField(
         'Цветовой HEX-код',
         default='#49B64E',
         format='hex',
         max_length=7,
-        unique=True
-
+        unique=True,
     )
     slug = models.SlugField(
         verbose_name='Слаг',
@@ -94,12 +96,15 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
+        verbose_name='Ингридиенты',
         related_name='recipes',
+        through='RecipeIngredientAmount',
     )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Теги рецептов',
         related_name='recipes',
+        # ? а нужна последняя строчка??
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
@@ -182,22 +187,26 @@ class RecipeIngredientAmount(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipes',
+        related_name='ingredienttorecipe',
         verbose_name='Рецепт',
     )
     amount = models.SmallIntegerField(
         verbose_name='Количество ингридиентов в рецепте',
+        validators=[MinValueValidator(1),],
     )
 
     class Meta:
+        ordering = ('-id', )
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецепте'
         constraints = (
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique_ingredient_amount'
+                name='unique_ingredient_amount',
             ),
         )
 
     def __str__(self):
-        return f"{self.ingredient} –– {self.recipe} {self.amount}"
+        return (
+            f'{self.ingredient.name} :: {self.ingredient.measurement_unit}'
+            f' - {self.amount}')

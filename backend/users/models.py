@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 
 
@@ -14,6 +15,7 @@ class User(AbstractUser):
     username = models.CharField(
         'Имя пользователя',
         max_length=200,
+        validators=(UnicodeUsernameValidator(),),
         unique=True,
     )
     email = models.EmailField(
@@ -53,8 +55,9 @@ class Follow(models.Model):
                 name='unique_followers',
             ),
         )
+        ordering = ('-id', )
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
     def __str__(self) -> str:
-        return f'{self.user} follows {self.following}'
+        return f'{self.user} подписан на {self.following}'
