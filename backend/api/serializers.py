@@ -24,12 +24,16 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('name',)
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class GetRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
         fields = ('name', 'text',)
+
+
+class CreateRecipeSerializer(serializers.ModelSerializer):
+    pass
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -43,5 +47,9 @@ class CreateUserSerializer(serializers.ModelSerializer):
     pass
 
 
-class CreateRecipeSerialixer(serializers.ModelSerializer):
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    pass
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
     pass

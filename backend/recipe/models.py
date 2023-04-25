@@ -156,10 +156,10 @@ class FavoriteShoppingList(models.Model):
         return f'{self.user} add {self.recipe} in favorite.'
 
 
-class ShoppingList(FavoriteShoppingList):
+class ShoppingCart(FavoriteShoppingList):
 
     class Meta(FavoriteShoppingList.Meta):
-        default_related_name = 'shopping_list'
+        default_related_name = 'shopping_cart'
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
 
