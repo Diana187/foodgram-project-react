@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,6 +9,7 @@ from rest_framework.permissions import (IsAuthenticated,
                                         SAFE_METHODS)
 
 from api.filters import IngredientFilter, RecipeFilter
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (CreateRecipeSerializer, GetRecipeSerializer,
                              FavoriteSerializer, IngredientSerializer,
                              ShoppingCartSerializer, TagSerializer)
@@ -52,7 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
-    permission_classes = ()
+    permission_classes = (IsAuthorOrReadOnly, )
 
     def get_serializer_class(self):
 # Определяет сериализатор, используемый для конкретного метода
