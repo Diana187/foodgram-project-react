@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from api.mixins import CustomUserViewSet
 from api.pagination import RecipePagination
 from users.models import Follow
-from users.serializers import (CreateUserSerializer, GetUserSerializer, 
+from users.serializers import (CreateUserSerializer, UserSerializer, 
                                SetPasswordSerializer, GetFollowSerializer,
                                FollowSerializer)
 
@@ -24,7 +24,7 @@ class UserViewSet(CustomUserViewSet):
     def get_serializer_class(self):
 # возвращает класс сериализатора в зависимости от метода
         if self.request.method in SAFE_METHODS:
-            return GetUserSerializer
+            return UserSerializer
         return CreateUserSerializer
     
     @action(
@@ -97,7 +97,7 @@ class UserViewSet(CustomUserViewSet):
         author = get_object_or_404(User, id=kwargs['pk'])
         if user == author:
             return Response(
-                {'errors': 'Нельзя подписаться/отписаться от/на самого себя'},
+                {'errors': 'Нельзя подписаться на самого себя.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         following = Follow.objects.filter(
@@ -112,7 +112,7 @@ class UserViewSet(CustomUserViewSet):
             serializer = FollowSerializer(
                 author,
                 data=request.data,
-                context={"request": request}
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             Follow.objects.create(user=request.user, author=author)
@@ -120,7 +120,7 @@ class UserViewSet(CustomUserViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
                 )
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             follow = get_object_or_404(Follow, user=user, author=author)
             follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

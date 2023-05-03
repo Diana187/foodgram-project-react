@@ -31,7 +31,7 @@ class Ingredient(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return f'{self.name} {self.measure}'
+        return f'{self.name} {self.measurement_unit}'
 
 
 class Tag(models.Model):
@@ -108,8 +108,9 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        help_text='Введите время готовкив минутах',
+        help_text='Введите время приготовления в минутах',
         default=1,
+        validators=[MinValueValidator(1)],
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
@@ -139,13 +140,11 @@ class FavoriteShoppingList(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name="%(app_label)s_%(class)s_related",
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_related",
     )
 
     class Meta:
@@ -190,9 +189,9 @@ class RecipeIngredientAmount(models.Model):
         related_name='ingredienttorecipe',
         verbose_name='Рецепт',
     )
-    amount = models.SmallIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество ингридиентов в рецепте',
-        validators=[MinValueValidator(1),],
+        validators=[MinValueValidator(1)],
     )
 
     class Meta:

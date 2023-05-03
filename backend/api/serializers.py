@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers, validators
 
 from core.utils_serializers import Base64ImageField
-from users.serializers import GetUserSerializer
+from users.serializers import UserSerializer
 from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
 
 
@@ -68,15 +68,15 @@ class TagSerializer(serializers.ModelSerializer):
 
 class GetRecipeSerializer(serializers.ModelSerializer):
 # получение списка рецептов, только для чтения
-    author = GetUserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     tags = TagSerializer(
         many=True,
-        read_only=True
+        read_only=True,
     )
     ingredients = RecipeIngredientAmountSerializer(
         many=True,
         read_only=True,
-        source='recipes'
+        source='recipes',
     )
     image = Base64ImageField(read_only=True)
     is_favorited = serializers.SerializerMethodField(read_only=True)
@@ -90,14 +90,27 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             'is_favorited', 'is_in_shopping_cart', 'name',
             'image', 'text', 'cooking_time',
         )
+        read_only_fields = (
+            'is_favorite',
+            'is_shopping_cart',
+        )
     
     def get_is_favorited(self, object):
-# находится ли рецепт в избранном
-        return object.id in self.context['favorite_recipes']
+        """Возвращает True, если рецепт находится в избранном,
+        в противном случае возвращает False."""
 
+        if 'favorites' in self.context:
+            return object.id in self.context['favorites']
+        return False
+    
     def get_is_in_shopping_cart(self, object):
-# находится ли рецепт в списке покупок
-        return object.id in self.context['shopping_cart']
+        """Возвращает True, если рецепт находится в списке покупок,
+        в противном случае возвращает False."""
+
+        if 'shopping_cart' in self.context:
+            return object.id in self.context['shopping_cart']
+        return False
+
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
@@ -106,10 +119,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True,
     )
-    author = GetUserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     ingredients = CreateRecipeIngredientAmountSerializerSerializer(
         many=True,
-        source='ingredients',
     )
     image = Base64ImageField(required=False, allow_null=True)
     cooking_time = serializers.IntegerField()
@@ -117,7 +129,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
-                  'name', 'image', 'text', 'cooking_time')
+                  'name', 'image', 'text', 'cooking_time', )
     
     def validate(self, object):
         if not object.get('tags'):
@@ -199,7 +211,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 # избранное
     class Meta:
         model = Favorite
-        fields = ('user', 'recipe')
+        fields = ('user', 'recipe', )
         validators = [
             validators.UniqueTogetherValidator(
                 queryset=Favorite.objects.all(),

@@ -9,7 +9,8 @@ from recipe.models import Recipe
 from users.models import User, Follow
 
 
-class GetUserSerializer(serializers.ModelSerializer):
+# class GetUserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
 # возвращает поле 'is_subscribed',показывающее,
 # подписан ли текущий пользователь на этого пользователя
     is_subscribed = serializers.SerializerMethodField()
@@ -91,11 +92,16 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ('user', 'author', )
 
-    def validate(self, data):
-        if data['user'] == data['author']:
-            raise serializers.ValidationError(
-                'Нельзя подписаться на себя.'
-            )
+    # def validate(self, data):
+    #     if data['user'] == data['author']:
+    #         raise serializers.ValidationError(
+    #             'Нельзя подписаться на себя.'
+    #         )
+    #     return data
+    
+    def validate_author(self, data):
+        if self.context.get('request').user == data:
+            raise serializers.ValidationError('Нельзя подписаться на себя.')
         return data
 
     def create(self, validated_data):
