@@ -1,9 +1,10 @@
-from django_filters import rest_framework as filters
+from django_filters import rest_framework as filters, FilterSet
+from rest_framework import filters as f
 
 from recipe.models import Ingredient, Recipe, Tag
 
 
-class IngredientFilter(filters.CharFilter):
+class IngredientFilter(f.SearchFilter):
 # фильтр для ингридиентов: поиск по названию
     search_param = 'name'
 
@@ -12,7 +13,7 @@ class IngredientFilter(filters.CharFilter):
         fields = ('name',)
 
 
-class RecipeFilter(filters.FilterSet):
+class RecipeFilter(FilterSet):
 # класс фильтра для модели Recipe. Позволяет производить поиск рецептов
 # по тегам, автору, наличию в списке избранного и корзине покупок.
 

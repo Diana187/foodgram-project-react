@@ -26,22 +26,6 @@ class RecipeSimpleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name',
                   'image', 'cooking_time',)
 
-
-# def add_tags(object, tags):
-# # добавляет тэги в рцепт
-#       for tag in tags:
-#            object.tags.add(tag)
-
-
-# def add_ingredients(model, object, inredients):
-# # добавляет ингридиенты в рцепт
-#       for ingredient in inredients:
-#            model.objects.get_or_create(
-#                  recipe=object,
-#                  ingredient=ingredient['id'],
-#                  amount=ingredient['amount']
-#             )
-
 #  в CreateRecipeSerializer было так, для этого верхние функции
 #  @transaction.atomic
 #     def create(self, validated_data):

@@ -14,6 +14,7 @@ from api.serializers import (CreateRecipeSerializer, GetRecipeSerializer,
                              FavoriteSerializer, IngredientSerializer,
                              ShoppingCartSerializer, TagSerializer)
 from api.pagination import RecipePagination
+# from core.utils_serializers import RecipeSimpleSerializer
 from recipe.models import (
     Favorite, Ingredient, RecipeIngredientAmount,
     Recipe, ShoppingCart, Tag)
@@ -52,7 +53,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
-    permission_classes = (IsAuthorOrReadOnly, )
+    permission_classes = (IsAuthorOrReadOnly, IsAuthenticated, )
+    # IsAuthenticatedOrReadOnly
 
     def get_serializer_class(self):
 # Определяет сериализатор, используемый для конкретного метода
@@ -83,7 +85,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         methods=['get'],
         detail=False,
-        permission_classes=(IsAuthenticated, )
+        permission_classes=(IsAuthenticated, ),
+        url_path='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
 # формирует список покупок из ингридиентов рецепта, считает количество ингридиентов
@@ -99,63 +102,79 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
         return self.send_file(ingredients)
-    
+
     @action(
-        methods=['post'],
+        methods=['post', 'delete'],
         detail=True,
-        permission_classes=(IsAuthenticated, )
+        permission_classes=(IsAuthenticated, ),
+        url_path='shopping_cart',
     )
-    def post_shopping_cart(self, request, pk):
-# добавляет рецепт в список покупок
-        context = {'request': request}
+    def shopping_cart(self, request, pk):
+# добавляет и удаляет рецепт из списа покупок
+        user=request.user.id
+        # context = {'request': request}
         recipe = get_object_or_404(Recipe, id=pk)
         data = {
-            'user': request.user.id,
+            'user': user.id,
             'recipe': recipe.id
         }
-        serializer = ShoppingCartSerializer(data=data, context=context)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @post_shopping_cart.mapping.delete
-    def destroy_shopping_cart(self, request, pk):
-# удаляет рецепт из списка покупок
-        get_object_or_404(
-            ShoppingCart,
-            user=request.user.id,
-            recipe=get_object_or_404(Recipe, id=pk)
-        ).delete()
-        return Response(
-            'Рецепт удалён из корзины',
-            status=status.HTTP_204_NO_CONTENT)
+        serializer = ShoppingCartSerializer(
+            data=data, context=self.get_serializer_context()
+        )
+        if request.method == 'POST':
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+                return Response(
+                    {'errors': 'Рецепт уже есть в списке покупок.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED
+            )
+        if request.method == "DELETE":
+            if not ShoppingCart.objects.filter(user=user, recipe=recipe):
+                return Response(
+                    {'errors': 'Этого рецепта нет в списке покупок.'},
+                    status=status.HTTP_400_BAD_REQUEST
+            )
+            ShoppingCart.objects.get(user=user, recipe=recipe).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     @action(
-        methods=['post'],
+        methods=['post', 'delete'],
         detail=True,
-        permission_classes=(IsAuthenticated, )
+        permission_classes=(IsAuthenticated, ),
+        url_path='favorite'
     )
-    def post_favorite(self, request, pk):
-# добавляет рецепт в избранное
-        context = {'request': request}
+    def favorite(self, request, pk):
+# добавляет и удаляет рецепт из избранного
+        user=request.user.id
         recipe = get_object_or_404(Recipe, id=pk)
         data = {
-            'user': request.user.id,
+            'user': user,
             'recipe': recipe.id
         }
-        serializer = FavoriteSerializer(data=data, context=context)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @post_favorite.mapping.delete
-    def destroy_favorite(self, request, pk):
-# удаляет рецеп из избранного
-        get_object_or_404(
-            Favorite,
-            user=request.user,
-            recipe=get_object_or_404(Recipe, id=pk)
-        ).delete()
-        return Response(
-            'Рецепт удалён из избранного',
-            status=status.HTTP_204_NO_CONTENT)
+        serializer = FavoriteSerializer(
+            data=data, context=self.get_serializer_context()
+        )
+        if request.method == 'POST':
+            if Favorite.objects.filter(user=user, recipe=recipe).exists():
+                return Response(
+                    {'errors': 'Рецепт уже есть в избранном.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == "DELETE":
+            if not Favorite.objects.filter(user=user, recipe=recipe):
+                return Response(
+                    {'errors': 'Этого рецепта нет в избранном.'},
+                    status=status.HTTP_400_BAD_REQUEST
+            )
+            Favorite.objects.get(user=user, recipe=recipe).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

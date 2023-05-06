@@ -3,14 +3,18 @@ from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count
 from rest_framework import serializers, validators
 
-from core.utils_serializers import RecipeSimpleSerializer
-# from api.serializers import GetRecipeSerializer
+from djoser.serializers import UserCreateSerializer
+from django.contrib.auth import get_user_model
+
+from core.utils import RecipeSimpleSerializer
 from recipe.models import Recipe
 from users.models import User, Follow
 
+User = get_user_model()
 
-# class GetUserSerializer(serializers.ModelSerializer):
-class UserSerializer(serializers.ModelSerializer):
+# class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(UserCreateSerializer):
+# отображение пользователя
 # возвращает поле 'is_subscribed',показывающее,
 # подписан ли текущий пользователь на этого пользователя
     is_subscribed = serializers.SerializerMethodField()
@@ -22,26 +26,30 @@ class UserSerializer(serializers.ModelSerializer):
                   'first_name', 'last_name', 'is_subscribed', )
 
     def get_is_subscribed(self, object):
-# метод для получения значения 'is_subscribed'
         request = self.context.get('request')
-        user = self.context.get('request').user
-        return (request is not None
-                and user.is_authenticated
-                and Follow.objects.filter
-                (user=request.user, author=object.user).exists())
+        return (request and request.user.is_authenticated
+                and object.following.filter(user=request.user).exists())
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
 # создание пользователя
 
-    class Meta:
+    class Meta(UserCreateSerializer.Meta):
         model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'password', )
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
         extra_kwargs = {'password': {'write_only': True}}
     
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
         return super(CreateUserSerializer, self).create(validated_data)
+    
+    # def create(self, validated_data):
+    #     password = validated_data.pop('password', None)
+    #     instance = self.Meta.model(**validated_data)
+    #     if password is not None:
+    #         instance.set_password(password)
+    #     instance.save()
+    #     return instance
 
 class GetFollowSerializer(serializers.ModelSerializer):
 # выводит список подписок пользователя
@@ -58,11 +66,8 @@ class GetFollowSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, author):
 # получение is_subscribed
         request = self.context.get('request')
-        user = self.context.get('request').user
-        return (request is not None
-                and user.is_authenticated
-                and Follow.objects.filter
-                (user=request.user, author=object.user).exists())
+        return (request and request.user.is_authenticated
+                and object.following.filter(user=request.user).exists())
     
     def get_recipes_count(self, author):
 # количество рецептов в виде целого числа
@@ -90,7 +95,7 @@ class FollowSerializer(serializers.ModelSerializer):
 # сериализатор создания подписки
     class Meta:
         model = Follow
-        fields = ('user', 'author', )
+        fields = ('user', 'following', )
 
     # def validate(self, data):
     #     if data['user'] == data['author']:
@@ -99,7 +104,7 @@ class FollowSerializer(serializers.ModelSerializer):
     #         )
     #     return data
     
-    def validate_author(self, data):
+    def validate_following(self, data):
         if self.context.get('request').user == data:
             raise serializers.ValidationError('Нельзя подписаться на себя.')
         return data
@@ -107,7 +112,7 @@ class FollowSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if Follow.objects.filter(
                 user=validated_data['user'],
-                author=validated_data['author']).exists():
+                following=validated_data['following']).exists():
             raise validators.UniqueTogetherValidator(
                 'Вы уже подписаны на этого пользователя.'
             )

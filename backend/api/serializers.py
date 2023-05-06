@@ -1,7 +1,7 @@
-from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
-from core.utils_serializers import Base64ImageField
+from core.utils import Base64ImageField
 from users.serializers import UserSerializer
 from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
 
@@ -86,9 +86,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'author', 'ingredients',
-            'is_favorited', 'is_in_shopping_cart', 'name',
-            'image', 'text', 'cooking_time',
+            'id', 'name',  'text', 'tags',
+            'author', 'ingredients', 'is_favorited',
+            'is_in_shopping_cart', 'image', 'cooking_time',
         )
         read_only_fields = (
             'is_favorite',
@@ -110,8 +110,6 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if 'shopping_cart' in self.context:
             return object.id in self.context['shopping_cart']
         return False
-
-
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
 # создание рецепта
@@ -136,37 +134,41 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Должен быть указан хотя бы один тег.'
             )
+        tags_len = len(object.get('tags'))
+        if tags_len == 0:
+            raise serializers.ValidationError(
+                'Нельзя создать рецепт без тегов.'
+            )
         if not object.get('ingredients'):
             raise serializers.ValidationError(
                 'Должен быть указан хотя бы один ингридиент.'
             )
-        # if not object.get('cooking_time'):
-        #     raise serializers.ValidationError(
-        #         'Укажите время приготовления')
+        if not object.get('cooking_time'):
+            raise serializers.ValidationError(
+                'Укажите время приготовления')
         return object
 
-    @transaction.atomic
-    def tags_and_ingredients_set(self, recipe, tags, ingredients):
+    def many_to_many_tag_ingredients(self, recipe, tags, ingredients):
         recipe.tags.set(tags)
         RecipeIngredientAmount.objects.bulk_create(
             [RecipeIngredientAmount(
                 recipe=recipe,
-                ingredient=Ingredient.objects.get(pk=ingredient['id']),
-                amount=ingredient['amount']
+                ingredient=ingredient.pop('id'),
+                # ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
+                # amount=ingredient['amount']
+                amount=ingredient.pop('amount')
             ) for ingredient in ingredients]
         )
-    
-    @transaction.atomic
+
     def create(self, validated_data):
 # создает новый объект рецепта
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(author=self.context['request'].user,
-                                       **validated_data)
-        self.tags_and_ingredients_set(recipe, tags, ingredients)
+        author = self.context.get('request').user
+        recipe = Recipe.objects.create(author=author, **validated_data)
+        self.many_to_many_tag_ingredients(recipe, tags, ingredients)
         return recipe
 
-    @transaction.atomic
     def update(self, instance, validated_data):
 # обновляет существующий объект рецепта
         instance.image = validated_data.get('image', instance.image)
@@ -181,7 +183,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         RecipeIngredientAmount.objects.filter(
             recipe=instance,
             ingredient__in=instance.ingredients.all()).delete()
-        self.tags_and_ingredients_set(instance, tags, ingredients)
+        self.many_to_many_tag_ingredients(instance, tags, ingredients)
         instance.save()
         return instance
 
@@ -218,6 +220,3 @@ class FavoriteSerializer(serializers.ModelSerializer):
                 fields=['user', 'recipe'],
             )
         ]
-
-    def to_representation(self, instance):
-        return Favorite(instance.recipe).data

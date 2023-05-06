@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, SAFE_METHODS
 from rest_framework.response import Response
 
 from api.mixins import CustomUserViewSet
@@ -18,7 +18,7 @@ User = get_user_model()
 class UserViewSet(CustomUserViewSet):
 # вьюсет для пользователя 
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     pagination_class = RecipePagination
 
     def get_serializer_class(self):
@@ -95,14 +95,18 @@ class UserViewSet(CustomUserViewSet):
 # подписывает или отписывает автора на другого пользователя
         user = request.user
         author = get_object_or_404(User, id=kwargs['pk'])
+        data={
+            'user': user.id,
+            'following': author.id
+        }
         if user == author:
             return Response(
                 {'errors': 'Нельзя подписаться на самого себя.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         following = Follow.objects.filter(
-            author=author,
-            user=request.user
+            following=author,
+            user=user,
         )
         if request.method == 'POST':
             if following.exists():
@@ -110,18 +114,29 @@ class UserViewSet(CustomUserViewSet):
                     {'errors': 'Нельзя повторно подписаться на автора.'},
                     status=status.HTTP_400_BAD_REQUEST)
             serializer = FollowSerializer(
-                author,
-                data=request.data,
+                data=data,
                 context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            Follow.objects.create(user=request.user, author=author)
+            serializer.save()
+            # Follow.objects.create(user=user, following=author)
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED
-                )
-        if request.method == 'DELETE':
-            follow = get_object_or_404(Follow, user=user, author=author)
-            follow.delete()
+            )
+
+
+        # if request.method == 'DELETE':
+        #     follow = get_object_or_404(Follow, user=user, author=author)
+        #     follow.delete()
+        #     return Response(status=status.HTTP_204_NO_CONTENT)
+        # # return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+        if request.method == "DELETE":
+            if not Follow.objects.filter(user=user, author=author):
+                return Response(
+                    {'errors': 'У вас нет такой подписки.'},
+                    status=status.HTTP_400_BAD_REQUEST
+            )
+            Follow.objects.get(user=user, author=author).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

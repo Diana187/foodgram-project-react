@@ -1,11 +1,11 @@
 import os
-
+from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'yii)b0t!b890*ia^haxun5w(t(1j)q-96c9u#_fg78yntw1(76'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -18,9 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'djoser',
     'django_filters',
     'rest_framework.authtoken',
+    'djoser',
     'colorfield',
     'recipe.apps.RecipeConfig',
     'users.apps.UsersConfig',
@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
 }
 
