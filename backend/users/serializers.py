@@ -121,25 +121,14 @@ class FollowSerializer(serializers.ModelSerializer):
 
 class SetPasswordSerializer(serializers.ModelSerializer):
 # смена пароля
-    current_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+    current_password = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ('current_password', 'new_password', )
+        fields = ('new_password', 'current_password', )
 
     def validate_current_password(self, value):
-        request = self.context.get('request')
-        if request.user.check_password(value):
-            return value
-        raise serializers.ValidationError(
-            'Вы указали неправильный пароль.'
-        )
-
-    def validate_new_password(self, value):
-        if ('current_password',) == ('new_password',):
-            raise serializers.ValidationError(
-                'Пароли не должны совпадать.'
-            )
-        validate_password(value)
+        if not self.instance.check_password(value):
+            raise serializers.ValidationError('Вы указали неправильный пароль.')
         return value

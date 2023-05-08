@@ -63,7 +63,7 @@ class UserViewSet(CustomUserViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(
-                {'detail': 'Пароль успешно изменен'},
+                {'detail': 'Пароль успешно изменен.'},
                 status=status.HTTP_204_NO_CONTENT
             )
         return Response(serializer.errors,
@@ -123,20 +123,15 @@ class UserViewSet(CustomUserViewSet):
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED
-            )
-
-
-        # if request.method == 'DELETE':
-        #     follow = get_object_or_404(Follow, user=user, author=author)
-        #     follow.delete()
-        #     return Response(status=status.HTTP_204_NO_CONTENT)
-        # # return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
-        if request.method == "DELETE":
-            if not Follow.objects.filter(user=user, author=author):
+            )    
+        if request.method == 'DELETE':
+            if not Follow.objects.filter(user=user, following=author):
                 return Response(
                     {'errors': 'У вас нет такой подписки.'},
                     status=status.HTTP_400_BAD_REQUEST
             )
-            Follow.objects.get(user=user, author=author).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            Follow.objects.get(user=user, following=author).delete()
+            return Response(
+                {'detail': 'Подписка отменена.'},
+                status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -91,13 +91,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
 # формирует список покупок из ингридиентов рецепта, считает количество ингридиентов
         user = request.user
-        if not user.shopping_list.exists():
+        if not user.shopping_cart.exists():
             return Response(
                 'В вашей корзине нет рецептов.',
                 status=status.HTTP_400_BAD_REQUEST,
             )
         ingredients = RecipeIngredientAmount.objects.filter(
-            recipe__shopping_list__user=user
+            recipe__shopping_cart__user=user
         ).order_by('ingredient__name').values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
@@ -109,14 +109,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated, ),
         url_path='shopping_cart',
     )
-    def shopping_cart(self, request, pk):
+    def shopping_cart(self, request, pk=None):
 # добавляет и удаляет рецепт из списа покупок
-        user=request.user.id
-        # context = {'request': request}
-        recipe = get_object_or_404(Recipe, id=pk)
+        user=request.user
+        recipe = get_object_or_404(Recipe, pk=pk)
         data = {
-            'user': user.id,
-            'recipe': recipe.id
+            'user': user.pk,
+            'recipe': recipe.pk
         }
         serializer = ShoppingCartSerializer(
             data=data, context=self.get_serializer_context()
