@@ -8,3 +8,5 @@ python-dotenv==1.0.0
 pytz==2023.3
 setuptools==60.10.0
 sqlparse==0.4.3
+djoser==2.1.0
+django-colorfield==0.8.0
