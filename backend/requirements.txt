@@ -10,3 +10,4 @@ setuptools==60.10.0
 sqlparse==0.4.3
 djoser==2.1.0
 django-colorfield==0.8.0
+gunicorn==20.1.0
