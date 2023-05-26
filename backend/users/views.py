@@ -30,7 +30,8 @@ class UserViewSet(CustomUserViewSet):
     @action(
         methods=['get'],
         detail=False,
-        permission_classes=(IsAuthenticated, )
+        permission_classes=(IsAuthenticated, ),
+        pagination_class = (RecipePagination, )
     )
     def me(self, request):
 # возвращает данные пользователя

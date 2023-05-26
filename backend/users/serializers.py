@@ -12,17 +12,15 @@ from users.models import User, Follow
 
 User = get_user_model()
 
-# class UserSerializer(serializers.ModelSerializer):
 class UserSerializer(UserCreateSerializer):
 # отображение пользователя
 # возвращает поле 'is_subscribed',показывающее,
 # подписан ли текущий пользователь на этого пользователя
     is_subscribed = serializers.SerializerMethodField()
-    # read_only?
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username',
+        fields = ('email', 'id', 'username', 'password',
                   'first_name', 'last_name', 'is_subscribed', )
 
     def get_is_subscribed(self, object):

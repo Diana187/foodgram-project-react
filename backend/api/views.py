@@ -36,7 +36,6 @@ class TagViewSet(viewsets.ModelViewSet):
 #ViewSet для модели Tag.
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    pagination_class = RecipePagination
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
 
@@ -53,7 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
-    permission_classes = (IsAuthorOrReadOnly, IsAuthenticated, )
+    permission_classes = (IsAuthorOrReadOnly, )
     # IsAuthenticatedOrReadOnly
 
     def get_serializer_class(self):
