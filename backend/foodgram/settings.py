@@ -141,10 +141,10 @@ AUTH_USER_MODEL = 'users.User'
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': [
-        'rest_framework.pagination.LimitOffsetPagination',
-    ],
-    'PAGE_SIZE': 15,
+    # 'DEFAULT_PAGINATION_CLASS': [
+    #     'rest_framework.pagination.LimitOffsetPagination',
+    # ],
+    # 'PAGE_SIZE': 15,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
@@ -162,14 +162,13 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user': 'api.serializers.UserSerializer',
-        'user_list': 'api.serializers.UserSerializer',
-        'user_create': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
+        'user': 'users.serializers.UserSerializer',
+        # 'user_list': 'users.serializers.UserSerializer',
+        'user_create': 'users.serializers.CreateUserSerializer',
+        # 'current_user': 'users.serializers.UserSerializer',
     },
     "PERMISSIONS": {
         "user": ["djoser.permissions.CurrentUserOrAdminOrReadOnly"],
         "user_list": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"],
     },
-
 }
