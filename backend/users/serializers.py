@@ -51,6 +51,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     #     return instance
 
 class FollowRecipeSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Recipe
         fields = (

@@ -2,6 +2,7 @@ from django_filters import rest_framework as filters, FilterSet
 from rest_framework import filters as f
 
 from recipe.models import Ingredient, Recipe, Tag
+from users.models import User
 
 
 class IngredientFilter(f.SearchFilter):
@@ -22,6 +23,13 @@ class RecipeFilter(FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),
     )
+
+    author =filters.ModelChoiceFilter(
+        queryset=User.objects.all(),
+    )
+
+    # AllValuesMultipleFilter ?
+    
     is_favorited = filters.BooleanFilter(
         method='filter_is_favorited'
     )
@@ -39,7 +47,7 @@ class RecipeFilter(FilterSet):
     def filter_is_favorited(self, queryset, name, value):
         user = self.request.user
         if value and user.is_authenticated:
-            return queryset.filter(favorites_recipe__user=user)
+            return queryset.filter(favorites__user=user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):

@@ -194,12 +194,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
 # сериализатор корзины
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
-    class Meta:
-        model = ShoppingCart
-        fields = ('user', 'recipe',)
-
-    def create(self, validated_data):
+    def get_is_in_shopping_cart(self, validated_data):
         if ShoppingCart.objects.filter(
                 user=validated_data['user'],
                 recipe=validated_data['recipe']).exists():
@@ -207,6 +204,10 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
                 'Вы уже добавили рецепт в список покупок'
             )
         return ShoppingCart.objects.create(**validated_data)
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('user', 'recipe', 'is_in_shopping_cart', )
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

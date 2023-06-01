@@ -48,19 +48,38 @@ class RecipeViewSet(viewsets.ModelViewSet):
 # Скачивать список ингридиентов для рецепта.
 
     queryset = Recipe.objects.all()
-    # serializer_class = CreateRecipeSerializer
     pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
+    filterset_fields = ('tags',)
     permission_classes = (IsAuthorOrReadOnly, )
-    # IsAuthenticatedOrReadOnly
 
+#     def get_serializer_class(self): мой
+# # Определяет сериализатор, используемый для конкретного метода
+#         # if self.request.method in SAFE_METHODS:
+#         if self.action in ('list', 'retrieve'):
+#             return GetRecipeSerializer
+#         return CreateRecipeSerializer
+    
     def get_serializer_class(self):
-# Определяет сериализатор, используемый для конкретного метода
-        # if self.request.method in SAFE_METHODS:
-        if self.action in ('list', 'retrieve'):
-            return GetRecipeSerializer
+        if self.action == 'favorite' or self.action == 'shopping_cart':
+            return FavoriteSerializer
         return CreateRecipeSerializer
+
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        author = self.request.user
+        if self.request.GET.get('is_favorited'):
+            favorite_recipes_ids = Favorite.objects.filter(
+                user=author).values('recipe_id')
+
+            return queryset.filter(pk__in=favorite_recipes_ids)
+
+        if self.request.GET.get('is_in_shopping_cart'):
+            cart_recipes_ids = ShoppingCart.objects.filter(
+                user=author).values('recipe_id')
+            return queryset.filter(pk__in=cart_recipes_ids)
+        return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -117,10 +136,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'recipe': recipe.pk
         }
         serializer = ShoppingCartSerializer(
-            data=data, context=self.get_serializer_context()
+            data=data,
+            context=self.get_serializer_context()
+        )
+        shopping_list = ShoppingCart.objects.filter(
+            user=user,
+            recipe=recipe
         )
         if request.method == 'POST':
-            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            if shopping_list.exists():
                 return Response(
                     {'errors': 'Рецепт уже есть в списке покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -131,7 +155,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 serializer.data, status=status.HTTP_201_CREATED
             )
         if request.method == "DELETE":
-            if not ShoppingCart.objects.filter(user=user, recipe=recipe):
+            if not shopping_list:
                 return Response(
                     {'errors': 'Этого рецепта нет в списке покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
