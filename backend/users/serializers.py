@@ -41,14 +41,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
         return super(CreateUserSerializer, self).create(validated_data)
-    
-    # def create(self, validated_data):
-    #     password = validated_data.pop('password', None)
-    #     instance = self.Meta.model(**validated_data)
-    #     if password is not None:
-    #         instance.set_password(password)
-    #     instance.save()
-    #     return instance
+
 
 class FollowRecipeSerializer(serializers.ModelSerializer):
     
@@ -146,7 +139,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class SetPasswordSerializer(serializers.ModelSerializer):
-# смена пароля
+    """Устанавливает новый пароль для пользователя."""
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
 
@@ -154,7 +147,17 @@ class SetPasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('new_password', 'current_password', )
 
+        
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'password':
+                instance.set_password(value)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
+
     def validate_current_password(self, value):
         if not self.instance.check_password(value):
-            raise serializers.ValidationError('Вы указали неправильный пароль.')
+            raise serializers.ValidationError('Вы указали неверный пароль.')
         return value

@@ -36,14 +36,14 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit', )
+    list_display = ('name', 'measurement_unit', 'id', )
     list_filter = ('name', )
     search_fields = ('name', )
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug', )
+    list_display = ('name', 'color', 'slug', 'id', )
     list_filter = ('name', )
     search_fields = ('name', )
 

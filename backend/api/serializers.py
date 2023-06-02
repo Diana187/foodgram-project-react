@@ -4,6 +4,7 @@ from rest_framework import serializers, validators
 from core.utils import Base64ImageField
 from users.serializers import UserSerializer
 from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
+from core.utils import RecipeSimpleSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -111,8 +112,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             return object.id in self.context['shopping_cart']
         return False
 
+
 class CreateRecipeSerializer(serializers.ModelSerializer):
-# создание рецепта
+    """Создание рецепта."""
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
@@ -161,11 +163,11 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-# создает новый объект рецепта
+        """создает новый объект рецепта"""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         author = self.context.get('request').user
-        recipe = Recipe.objects.create(author=author, **validated_data)
+        recipe = Recipe.objects.bulk_create(author=author, **validated_data)
         self.many_to_many_tag_ingredients(recipe, tags, ingredients)
         return recipe
 

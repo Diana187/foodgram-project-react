@@ -47,20 +47,8 @@ class UserViewSet(CustomUserViewSet):
     )
     def set_password(self, request):
 # устанавливает новый пароль для пользователя
-        # user = self.request.user
-        # serializer = SetPasswordSerializer(
-        #     data=request.data,
-        #     context={'request': request})
-        # if serializer.is_valid():
-        #     user.set_password(serializer.validated_data['new_password'])
-        #     user.save()
-        #     return Response(serializer.data, status=status.HTTP_200_OK)
-        # return Response(serializer.errors,
-        #                 status=status.HTTP_400_BAD_REQUEST)
-
         user = self.request.user
         serializer = SetPasswordSerializer(user, data=request.data)
-
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(

@@ -40,12 +40,11 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-
-# ViewSet для модели Recipe. Предоставляет возможности просмотра,
-# создания, изменения и удаления рецептов.
-# Позволяет добавлять/удалять рецепты из избранного
-# Добавлять/удалять рецепт из списка покупок
-# Скачивать список ингридиентов для рецепта.
+    """ViewSet для модели Recipe. Предоставляет возможности просмотра,
+    создания, изменения и удаления рецептов.
+    Позволяет добавлять/удалять рецепты из избранного
+    Добавлять/удалять рецепт из списка покупок
+    Скачивать список ингридиентов для рецепта."""
 
     queryset = Recipe.objects.all()
     pagination_class = RecipePagination
@@ -53,13 +52,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     filterset_fields = ('tags',)
     permission_classes = (IsAuthorOrReadOnly, )
-
-#     def get_serializer_class(self): мой
-# # Определяет сериализатор, используемый для конкретного метода
-#         # if self.request.method in SAFE_METHODS:
-#         if self.action in ('list', 'retrieve'):
-#             return GetRecipeSerializer
-#         return CreateRecipeSerializer
     
     def get_serializer_class(self):
         if self.action == 'favorite' or self.action == 'shopping_cart':
