@@ -12,23 +12,23 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit', 'created',
-                  'updated', )
+        fields = '__all__'
 
 
 class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
 # общее количество ингридиентов 
     id = serializers.PrimaryKeyRelatedField(
-        source='ingredient',
+        source='ingredient.id',
         read_only=True,
     )
     name = serializers.SlugRelatedField(
-        source='ingredient',
+        # source='ingredient',
         slug_field='name',
         read_only=True,
+        source='ingredient.name',
     )
     measurement_unit = serializers.SlugRelatedField(
-        source='ingredient',
+        source='ingredient.measurement_unit',
         slug_field='measurement_unit',
         read_only=True,
     )
@@ -40,12 +40,19 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
             'measurement_unit', 'amount',
         )
 
+    class Meta:
+        model = RecipeIngredientAmount
+        fields = (
+            'id', 'name', 'measurement_unit', 'amount',
+        )
+
 
 class CreateRecipeIngredientAmountSerializerSerializer(serializers.ModelSerializer):
 # создание ингредиентов в рецепте
-    id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all()
-    )
+    # id = serializers.PrimaryKeyRelatedField(
+    #     queryset=Ingredient.objects.all()
+    # )
+    id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = RecipeIngredientAmount
@@ -60,11 +67,13 @@ class CreateRecipeIngredientAmountSerializerSerializer(serializers.ModelSerializ
 
 
 class TagSerializer(serializers.ModelSerializer):
+    
 # сериализатор для всех полей
     class Meta:
         model = Tag
-        fields = ('name', 'color', 'slug',
-                  'created', 'updated', )
+        fields = '__all__'
+        # fields = ('name', 'color', 'slug',
+        #           'created', 'updated', )
 
 
 class GetRecipeSerializer(serializers.ModelSerializer):
@@ -167,7 +176,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         author = self.context.get('request').user
-        recipe = Recipe.objects.bulk_create(author=author, **validated_data)
+        recipe = Recipe.objects.create(author=author, **validated_data)
         self.many_to_many_tag_ingredients(recipe, tags, ingredients)
         return recipe
 
