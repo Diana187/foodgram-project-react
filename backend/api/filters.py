@@ -29,6 +29,7 @@ class RecipeFilter(FilterSet):
     )
 
     # AllValuesMultipleFilter ?
+    # NumberFilter ?
     
     is_favorited = filters.BooleanFilter(
         method='filter_is_favorited'
