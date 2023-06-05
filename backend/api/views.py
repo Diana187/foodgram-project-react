@@ -18,6 +18,7 @@ from api.pagination import RecipePagination
 from recipe.models import (
     Favorite, Ingredient, RecipeIngredientAmount,
     Recipe, ShoppingCart, Tag)
+from rest_framework import filters
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -31,6 +32,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (IngredientFilter, )
     search_fields = ('^name', )
 
+    # filterset_class = IngredientFilter
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    # filterset_fields = ('name',)
+    # search_fields = ('name')
 
 class TagViewSet(viewsets.ModelViewSet):
 #ViewSet для модели Tag.
