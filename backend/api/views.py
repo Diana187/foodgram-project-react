@@ -27,15 +27,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 # и детальной информации об ингредиентах
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    pagination_class = RecipePagination
     permission_classes = (IsAuthenticatedOrReadOnly, )
     filter_backends = (IngredientFilter, )
     search_fields = ('^name', )
 
-    # filterset_class = IngredientFilter
-    # filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    # filterset_fields = ('name',)
-    # search_fields = ('name')
 
 class TagViewSet(viewsets.ModelViewSet):
 #ViewSet для модели Tag.
