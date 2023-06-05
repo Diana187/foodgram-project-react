@@ -5,29 +5,25 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, SAFE_METHODS
 from rest_framework.response import Response
 
-from api.mixins import CustomUserViewSet
 from api.pagination import RecipePagination
 from users.models import Follow
 from users.serializers import ( CustomUserSerializer, GetFollowSerializer,
                                FollowSerializer)
-#  SetPasswordSerializer, CreateUserSerializer,
-# User = get_user_model()
 
 from users.models import User
 from djoser.views import UserViewSet
 
 class UserViewSet(UserViewSet):
-# вьюсет для пользователя 
+    """вьюсет для пользователя """
     queryset = User.objects.all()
     permission_classes = (AllowAny, )
     pagination_class = RecipePagination
     serializer_class = CustomUserSerializer
 
-    # def get_serializer_class(self):
-# возвращает класс сериализатора в зависимости от метода
-        # if self.request.method in SAFE_METHODS:
-        #     return UserSerializer
-        # return CreateUserSerializer
+    def get_serializer_class(self):
+        """возвращает класс сериализатора в зависимости от метода"""
+        if self.request.method in SAFE_METHODS:
+            return CustomUserSerializer
     
     @action(
         methods=['get'],
@@ -36,29 +32,11 @@ class UserViewSet(UserViewSet):
         pagination_class = (RecipePagination, )
     )
     def me(self, request):
-# возвращает данные пользователя
+        """возвращает данные пользователя"""
         return Response(
             self.get_serializer(request.user).data,
             status=status.HTTP_200_OK,
         )
-
-#     @action(
-#         methods=['post'],
-#         detail=False,
-#         permission_classes=(IsAuthenticated, )
-#     )
-#     def set_password(self, request):
-# # устанавливает новый пароль для пользователя
-#         user = self.request.user
-#         serializer = SetPasswordSerializer(user, data=request.data)
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-#             return Response(
-#                 {'detail': 'Пароль успешно изменен.'},
-#                 status=status.HTTP_204_NO_CONTENT
-#             )
-#         return Response(serializer.errors,
-#                         status=status.HTTP_400_BAD_REQUEST)
     
     @action(
         methods=['get'],
@@ -83,7 +61,7 @@ class UserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscribe(self, request, **kwargs):
-# подписывает или отписывает автора на другого пользователя
+        """подписывает или отписывает автора на другого пользователя"""
         user = request.user
         author = get_object_or_404(User, id=kwargs['pk'])
         data={
@@ -110,7 +88,6 @@ class UserViewSet(UserViewSet):
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            # Follow.objects.create(user=user, following=author)
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED
