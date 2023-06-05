@@ -8,24 +8,26 @@ from rest_framework.response import Response
 from api.mixins import CustomUserViewSet
 from api.pagination import RecipePagination
 from users.models import Follow
-from users.serializers import (CreateUserSerializer, UserSerializer, 
-                               SetPasswordSerializer, GetFollowSerializer,
+from users.serializers import ( CustomUserSerializer, GetFollowSerializer,
                                FollowSerializer)
+#  SetPasswordSerializer, CreateUserSerializer,
+# User = get_user_model()
 
-User = get_user_model()
+from users.models import User
+from djoser.views import UserViewSet
 
-
-class UserViewSet(CustomUserViewSet):
+class UserViewSet(UserViewSet):
 # вьюсет для пользователя 
     queryset = User.objects.all()
     permission_classes = (AllowAny, )
     pagination_class = RecipePagination
+    serializer_class = CustomUserSerializer
 
-    def get_serializer_class(self):
+    # def get_serializer_class(self):
 # возвращает класс сериализатора в зависимости от метода
-        if self.request.method in SAFE_METHODS:
-            return UserSerializer
-        return CreateUserSerializer
+        # if self.request.method in SAFE_METHODS:
+        #     return UserSerializer
+        # return CreateUserSerializer
     
     @action(
         methods=['get'],
@@ -40,23 +42,23 @@ class UserViewSet(CustomUserViewSet):
             status=status.HTTP_200_OK,
         )
 
-    @action(
-        methods=['post'],
-        detail=False,
-        permission_classes=(IsAuthenticated, )
-    )
-    def set_password(self, request):
-# устанавливает новый пароль для пользователя
-        user = self.request.user
-        serializer = SetPasswordSerializer(user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(
-                {'detail': 'Пароль успешно изменен.'},
-                status=status.HTTP_204_NO_CONTENT
-            )
-        return Response(serializer.errors,
-                        status=status.HTTP_400_BAD_REQUEST)
+#     @action(
+#         methods=['post'],
+#         detail=False,
+#         permission_classes=(IsAuthenticated, )
+#     )
+#     def set_password(self, request):
+# # устанавливает новый пароль для пользователя
+#         user = self.request.user
+#         serializer = SetPasswordSerializer(user, data=request.data)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#             return Response(
+#                 {'detail': 'Пароль успешно изменен.'},
+#                 status=status.HTTP_204_NO_CONTENT
+#             )
+#         return Response(serializer.errors,
+#                         status=status.HTTP_400_BAD_REQUEST)
     
     @action(
         methods=['get'],

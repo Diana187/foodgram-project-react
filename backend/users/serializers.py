@@ -1,46 +1,67 @@
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.password_validation import validate_password
+# from django.contrib.auth.hashers import make_password
+# from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
-from djoser.serializers import UserCreateSerializer
+# from djoser.serializers import UserCreateSerializer
 from django.contrib.auth import get_user_model
 
 from core.utils import RecipeSimpleSerializer
 from recipe.models import Recipe
 from users.models import User, Follow
 
-User = get_user_model()
+# User = get_user_model()
 
-class UserSerializer(UserCreateSerializer):
-# отображение пользователя
-# возвращает поле 'is_subscribed',показывающее,
-# подписан ли текущий пользователь на этого пользователя
-    is_subscribed = serializers.SerializerMethodField()
+# class UserSerializer(UserCreateSerializer):
+# # отображение пользователя
+# # возвращает поле 'is_subscribed',показывающее,
+# # подписан ли текущий пользователь на этого пользователя
+#     is_subscribed = serializers.SerializerMethodField()
 
-    def get_is_subscribed(self, object):
-        request = self.context.get('request')
-        return (request and request.user.is_authenticated
-                and object.following.filter(user=request.user).exists())
+#     def get_is_subscribed(self, object):
+#         request = self.context.get('request')
+#         return (request and request.user.is_authenticated
+#                 and object.following.filter(user=request.user).exists())
+
+#     class Meta:
+#         model = User
+#         fields = ('email', 'id', 'username', 'password',
+#                   'first_name', 'last_name', 'is_subscribed', )
+
+from users.models import User
+from djoser.serializers import UserSerializer
+from rest_framework.fields import SerializerMethodField
+
+class CustomUserSerializer(UserSerializer):
+    """Сериализатор пользователя."""
+    is_subscribed = SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'password',
-                  'first_name', 'last_name', 'is_subscribed', )
+        fields = (
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed',
+        )
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if self.context.get('request').user.is_anonymous:
+            return False
+        return obj.following.filter(user=request.user).exists()
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
-# создание пользователя
+# class CreateUserSerializer(serializers.ModelSerializer):
+# # создание пользователя
 
-    class Meta(UserCreateSerializer.Meta):
-        model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
-        extra_kwargs = {'password': {'write_only': True}}
+#     class Meta(UserCreateSerializer.Meta):
+#         model = User
+#         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
+#         extra_kwargs = {'password': {'write_only': True}}
     
-    def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data['password'])
-        return super(CreateUserSerializer, self).create(validated_data)
+#     def create(self, validated_data):
+#         validated_data['password'] = make_password(validated_data['password'])
+#         return super(CreateUserSerializer, self).create(validated_data)
 
 
 class FollowRecipeSerializer(serializers.ModelSerializer):
@@ -138,26 +159,26 @@ class FollowSerializer(serializers.ModelSerializer):
         return Follow.objects.create(**validated_data)
 
 
-class SetPasswordSerializer(serializers.ModelSerializer):
-    """Устанавливает новый пароль для пользователя."""
-    new_password = serializers.CharField(required=True)
-    current_password = serializers.CharField(required=True)
+# class SetPasswordSerializer(serializers.ModelSerializer):
+#     """Устанавливает новый пароль для пользователя."""
+#     new_password = serializers.CharField(required=True)
+#     current_password = serializers.CharField(required=True)
 
-    class Meta:
-        model = User
-        fields = ('new_password', 'current_password', )
+#     class Meta:
+#         model = User
+#         fields = ('new_password', 'current_password', )
 
         
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            if attr == 'password':
-                instance.set_password(value)
-            else:
-                setattr(instance, attr, value)
-        instance.save()
-        return instance
+#     def update(self, instance, validated_data):
+#         for attr, value in validated_data.items():
+#             if attr == 'password':
+#                 instance.set_password(value)
+#             else:
+#                 setattr(instance, attr, value)
+#         instance.save()
+#         return instance
 
-    def validate_current_password(self, value):
-        if not self.instance.check_password(value):
-            raise serializers.ValidationError('Вы указали неверный пароль.')
-        return value
+#     def validate_current_password(self, value):
+#         if not self.instance.check_password(value):
+#             raise serializers.ValidationError('Вы указали неверный пароль.')
+#         return value
