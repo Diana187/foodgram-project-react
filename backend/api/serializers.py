@@ -176,10 +176,8 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         RecipeIngredientAmount.objects.bulk_create(
             [RecipeIngredientAmount(
                 recipe=recipe,
-                ingredient=ingredient.pop('id'),
-                # ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
-                # amount=ingredient['amount']
-                amount=ingredient.pop('amount')
+                ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
+                amount=ingredient['amount']
             ) for ingredient in ingredients]
         )
 
