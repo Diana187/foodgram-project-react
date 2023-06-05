@@ -125,7 +125,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path='shopping_cart',
     )
     def shopping_cart(self, request, pk=None):
-# добавляет и удаляет рецепт из списа покупок
+        """добавляет и удаляет рецепт из списа покупок"""
         user=request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         data = {

@@ -23,11 +23,9 @@ class RecipeFilter(FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),
     )
-
     author =filters.ModelChoiceFilter(
         queryset=User.objects.all(),
     )
-
     # AllValuesMultipleFilter ?
     # NumberFilter ?
     

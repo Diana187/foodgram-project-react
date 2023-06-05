@@ -1,11 +1,10 @@
-# from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password
 # from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
-# from djoser.serializers import UserCreateSerializer
-from django.contrib.auth import get_user_model
+from djoser.serializers import UserCreateSerializer, SetPasswordSerializer
 
 from core.utils import RecipeSimpleSerializer
 from recipe.models import Recipe
@@ -18,10 +17,10 @@ from rest_framework.fields import SerializerMethodField
 class CustomUserSerializer(UserSerializer):
     """отображение пользователя
     возвращает поле 'is_subscribed',показывающее,
-    одписан ли текущий пользователь на этого пользователя"""
+    подписан ли текущий пользователь на другого."""
     is_subscribed = SerializerMethodField(read_only=True)
 
-    class Meta:
+    class Meta(UserSerializer.Meta):
         model = User
         fields = (
             'email', 'id', 'username', 'first_name',
@@ -33,6 +32,23 @@ class CustomUserSerializer(UserSerializer):
         if self.context.get('request').user.is_anonymous:
             return False
         return obj.following.filter(user=request.user).exists()
+
+class CreateUserSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
+        extra_kwargs = {'password': {'write_only': True}}
+    
+    # def create(self, validated_data):
+    #     validated_data['password'] = make_password(validated_data['password'])
+    #     return super(CreateUserSerializer, self).create(validated_data)
+    
+class CustomSetPasswordSerializer(SetPasswordSerializer):
+    pass
+    # class Meta(UserSerializer.Meta):
+        # model = User
+        # fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
+        # extra_kwargs = {'password': {'write_only': True}}
 
 
 class FollowRecipeSerializer(serializers.ModelSerializer):

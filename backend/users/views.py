@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from api.pagination import RecipePagination
 from users.models import Follow
 from users.serializers import ( CustomUserSerializer, GetFollowSerializer,
-                               FollowSerializer)
+                               FollowSerializer, CreateUserSerializer)
 
 from users.models import User
 from djoser.views import UserViewSet
@@ -18,12 +18,13 @@ class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny, )
     pagination_class = RecipePagination
-    serializer_class = CustomUserSerializer
+    # serializer_class = CustomUserSerializer
 
-    def get_serializer_class(self):
-        """возвращает класс сериализатора в зависимости от метода"""
-        if self.request.method in SAFE_METHODS:
-            return CustomUserSerializer
+    # def get_serializer_class(self):
+    #     """возвращает класс сериализатора в зависимости от метода"""
+    #     if self.request.method in SAFE_METHODS:
+    #         return CustomUserSerializer
+    #     return CreateUserSerializer
     
     @action(
         methods=['get'],
@@ -44,7 +45,7 @@ class UserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscriptions(self, request):
-# список пользователей, на которых подписан
+        """список пользователей, на которых подписан"""
         user = request.user
         queryset = User.objects.filter(following__user=user)
         pages = self.paginate_queryset(queryset)
