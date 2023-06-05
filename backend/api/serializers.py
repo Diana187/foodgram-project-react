@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
 from core.utils import Base64ImageField
-from users.serializers import UserSerializer
+from users.serializers import CustomUserSerializer
 from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
 from core.utils import RecipeSimpleSerializer
 
@@ -78,7 +78,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class GetRecipeSerializer(serializers.ModelSerializer):
 # получение списка рецептов, только для чтения
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(
         many=True,
         read_only=True,
@@ -128,7 +128,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True,
     )
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     ingredients = CreateRecipeIngredientAmountSerializerSerializer(
         many=True,
     )

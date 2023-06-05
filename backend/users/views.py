@@ -18,14 +18,7 @@ class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny, )
     pagination_class = RecipePagination
-    # serializer_class = CustomUserSerializer
 
-    # def get_serializer_class(self):
-    #     """возвращает класс сериализатора в зависимости от метода"""
-    #     if self.request.method in SAFE_METHODS:
-    #         return CustomUserSerializer
-    #     return CreateUserSerializer
-    
     @action(
         methods=['get'],
         detail=False,
