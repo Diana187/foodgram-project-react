@@ -6,7 +6,7 @@ from rest_framework import serializers, validators
 
 from djoser.serializers import UserCreateSerializer, SetPasswordSerializer
 
-from core.utils import RecipeSimpleSerializer
+# from core.utils import RecipeSimpleSerializer
 from recipe.models import Recipe
 from users.models import User, Follow
 

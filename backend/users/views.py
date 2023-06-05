@@ -64,7 +64,7 @@ class UserViewSet(UserViewSet):
     def subscribe(self, request, **kwargs):
         """подписывает или отписывает автора на другого пользователя"""
         user = request.user
-        author = get_object_or_404(User, id=kwargs['pk'])
+        author = get_object_or_404(User, id=kwargs['id'])
         data={
             'user': user.id,
             'following': author.id
