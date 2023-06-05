@@ -109,8 +109,14 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         """Возвращает True, если рецепт находится в избранном,
         в противном случае возвращает False."""
 
-        if 'favorites' in self.context:
-            return object.id in self.context['favorites']
+        user = self.context['request'].user
+    
+        favorite = Favorite.objects.filter(
+            user=user,
+            recipe=object,
+        )
+        if favorite.exists():
+            return True
         return False
     
     def get_is_in_shopping_cart(self, object):
