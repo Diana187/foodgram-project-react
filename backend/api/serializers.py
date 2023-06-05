@@ -4,7 +4,7 @@ from rest_framework import serializers, validators
 from core.utils import Base64ImageField
 from users.serializers import CustomUserSerializer
 from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
-from core.utils import RecipeSimpleSerializer
+# from core.utils import RecipeSimpleSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -38,12 +38,6 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name',
             'measurement_unit', 'amount',
-        )
-
-    class Meta:
-        model = RecipeIngredientAmount
-        fields = (
-            'id', 'name', 'measurement_unit', 'amount',
         )
 
 

@@ -16,35 +16,12 @@ class Base64ImageField(serializers.ImageField):
 
         return super().to_internal_value(data)
 
-#  нужен?
-class RecipeSimpleSerializer(serializers.ModelSerializer):
-    """Сериализатор для уменьшенного представления рецепта"""
-    image = Base64ImageField
+# #  нужен?
+# class RecipeSimpleSerializer(serializers.ModelSerializer):
+#     """Сериализатор для уменьшенного представления рецепта"""
+#     image = Base64ImageField
 
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name',
-                  'image', 'cooking_time',)
-
-#  в CreateRecipeSerializer было так, для этого верхние функции
-#  @transaction.atomic
-#     def create(self, validated_data):
-#         ingredint_list = validated_data.pop('ingredient_list')
-#         tags = validated_data.pop('tags')
-#         author = self.context.get('request').user
-#         recipe = Recipe.objects.create(author=author, **validated_data)
-#         recipe.save()
-#         add_tags(recipe, tags)
-#         add_ingredients(AmountIngredientInRecipe, recipe, ingredint_list)
-
-#         return recipe
-
-#     @transaction.atomic
-#     def update(self, instance, validated_data):
-#         ingredint_list = validated_data.pop('ingredient_list')
-#         tags = validated_data.pop('tags')
-#         instance.tags.clear()
-#         add_tags(instance, tags)
-#         instance.ingredient.clear()
-#         add_ingredients(AmountIngredientInRecipe, instance, ingredint_list)
-#         return super().update(instance, validated_data)
+#     class Meta:
+#         model = Recipe
+#         fields = ('id', 'name',
+#                   'image', 'cooking_time',)

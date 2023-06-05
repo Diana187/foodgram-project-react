@@ -14,7 +14,7 @@ from api.serializers import (CreateRecipeSerializer, GetRecipeSerializer,
                              FavoriteSerializer, IngredientSerializer,
                              ShoppingCartSerializer, TagSerializer)
 from api.pagination import RecipePagination
-# from core.utils_serializers import RecipeSimpleSerializer
+
 from recipe.models import (
     Favorite, Ingredient, RecipeIngredientAmount,
     Recipe, ShoppingCart, Tag)
