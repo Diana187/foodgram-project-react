@@ -97,7 +97,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингридиенты',
-        related_name='recipes',
+        # related_name='recipes',
         through='RecipeIngredientAmount',
     )
     tags = models.ManyToManyField(
@@ -180,7 +180,7 @@ class RecipeIngredientAmount(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredients',
+        # related_name='ingredients',
         verbose_name='Ингридиент',
     )
     recipe = models.ForeignKey(
