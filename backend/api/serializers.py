@@ -5,6 +5,7 @@ from core.utils import Base64ImageField
 from users.serializers import CustomUserSerializer
 from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
 # from core.utils import RecipeSimpleSerializer
+from recipe.models import RecipeIngredientAmount
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -104,6 +105,10 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         в противном случае возвращает False."""
 
         user = self.context['request'].user
+
+        if user.is_anonymous:
+            return False
+
     
         favorite = Favorite.objects.filter(
             user=user,
@@ -117,6 +122,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         """Возвращает True, если рецепт находится в списке покупок,
         в противном случае возвращает False."""
         user = self.context['request'].user
+
+        if user.is_anonymous:
+            return False
     
         shopping_cart = ShoppingCart.objects.filter(
             user=user,
@@ -185,26 +193,17 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-# обновляет существующий объект рецепта
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time',
-            instance.cooking_time
-        )
-        tags = validated_data.pop('tags')
+        instance.tags.clear()
+        RecipeIngredientAmount.objects.filter(recipe=instance).delete()
+        instance.tags.set(validated_data.pop('tags'))
         ingredients = validated_data.pop('ingredients')
-        RecipeIngredientAmount.objects.filter(
-            recipe=instance,
-            ingredient__in=instance.ingredients.all()).delete()
-        self.many_to_many_tag_ingredients(instance, tags, ingredients)
-        instance.save()
-        return instance
+        self.many_to_many_tag_ingredients(instance, ingredients)
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
-        return GetRecipeSerializer(
-            instance, context=self.context).data
+        return GetRecipeSerializer(instance, context={
+            'request': self.context.get('request')
+        }).data
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
