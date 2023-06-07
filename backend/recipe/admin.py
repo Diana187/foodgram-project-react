@@ -31,7 +31,7 @@ class RecipeAdmin(admin.ModelAdmin):
             ingredients.name for ingredients
             in object.ingredients.all()
         ])
-    get_ingredients.short_description = 'Ингридиенты'
+    get_ingredients.short_description = 'ингредиенты'
 
 
 @admin.register(Ingredient)

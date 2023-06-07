@@ -17,8 +17,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
-# общее количество ингридиентов
-# сериализатор для связи ингридиентов и рецепта
+# общее количество ингредиентов
+# сериализатор для связи ингредиентов и рецепта
     id = serializers.ReadOnlyField(
         source = 'ingredient.id'
     )
@@ -162,7 +162,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             )
         if not object.get('ingredients'):
             raise serializers.ValidationError(
-                'Должен быть указан хотя бы один ингридиент.'
+                'Должен быть указан хотя бы один ингредиент.'
             )
         if not object.get('cooking_time'):
             raise serializers.ValidationError(

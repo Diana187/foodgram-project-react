@@ -8,7 +8,7 @@ from users.models import User
 
 class Ingredient(models.Model):
     name = models.CharField(
-        'Название ингридиента',
+        'Название ингредиента',
         db_index=True,
         max_length=200,
     )
@@ -26,8 +26,8 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ингредиенты'
+        verbose_name_plural = 'Ингредиенты'
         ordering = ('name',)
 
     def __str__(self):
@@ -96,7 +96,7 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        verbose_name='Ингридиенты',
+        verbose_name='Ингредиенты',
         # related_name='recipes',
         through='RecipeIngredientAmount',
     )
@@ -181,7 +181,7 @@ class RecipeIngredientAmount(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         # related_name='ingredients',
-        verbose_name='Ингридиент',
+        verbose_name='Ингредиент',
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -190,7 +190,7 @@ class RecipeIngredientAmount(models.Model):
         verbose_name='Рецепт',
     )
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество ингридиентов в рецепте',
+        verbose_name='Количество ингредиентов в рецепте',
         validators=[MinValueValidator(1)],
     )
 

@@ -44,7 +44,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     создания, изменения и удаления рецептов.
     Позволяет добавлять/удалять рецепты из избранного
     Добавлять/удалять рецепт из списка покупок
-    Скачивать список ингридиентов для рецепта."""
+    Скачивать список ингредиентов для рецепта."""
 
     queryset = Recipe.objects.all()
     pagination_class = RecipePagination
@@ -80,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     
     @staticmethod
     def send_file(ingredients):
-#  Выгружает ингридиенты из списка покупок в файл shopping_list.txt
+#  Выгружает ингредиенты из списка покупок в файл shopping_list.txt
         shopping_list = 'Купить:'
         for ingredient in ingredients:
             shopping_list += (
@@ -99,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
-# формирует список покупок из ингридиентов рецепта, считает количество ингридиентов
+# формирует список покупок из ингредиентов рецепта, считает количество ингредиентов
         user = request.user
         if not user.shopping_cart.exists():
             return Response(
