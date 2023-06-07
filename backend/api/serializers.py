@@ -17,9 +17,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
-# общее количество ингридиентов 
-    id = serializers.PrimaryKeyRelatedField(
-         queryset=Ingredient.objects.all()
+# общее количество ингридиентов
+# сериализатор для связи ингридиентов и рецепта
+    id = serializers.ReadOnlyField(
+        source = 'ingredient.id'
     )
     name = serializers.ReadOnlyField(
         source='ingredient.name',
