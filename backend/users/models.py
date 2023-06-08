@@ -2,8 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 
 class User(AbstractUser):
@@ -30,10 +28,9 @@ class User(AbstractUser):
     )
 
     class Meta:
-        verbose_name='Пользователь'
+        verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ('first_name', 'last_name',)
-
 
     def __str__(self):
         return self.username
@@ -65,7 +62,7 @@ class Follow(models.Model):
         ordering = ('-id', )
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-    
+
     def clean(self) -> None:
         if self.user == self.following:
             raise ValidationError('Вы не можете подписаться на самого себя.')
