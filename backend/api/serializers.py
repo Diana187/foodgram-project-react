@@ -9,7 +9,7 @@ from users.serializers import CustomUserSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-# модель Ingredient для всех полей
+    """Сериализатор для ингредиентов."""
 
     class Meta:
         model = Ingredient
@@ -17,8 +17,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
-# общее количество ингредиентов
-# сериализатор для связи ингредиентов и рецепта
+    """Сериализатор для связи ингредиентов и рецепта."""
     id = serializers.ReadOnlyField(
         source = 'ingredient.id'
     )
@@ -39,10 +38,7 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeIngredientAmountSerializerSerializer(serializers.ModelSerializer):
-# создание ингредиентов в рецепте
-    # id = serializers.PrimaryKeyRelatedField(
-    #     queryset=Ingredient.objects.all()
-    # )
+    """Сериализатор для создания рецепта."""
     id = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -50,25 +46,21 @@ class CreateRecipeIngredientAmountSerializerSerializer(serializers.ModelSerializ
         fields = ('id', 'amount', )
 
     def to_representation(self, instance):
-# отображает поля:'id', 'name', 'measurement_unit', 'amount'
-
         serializer = RecipeIngredientAmountSerializer(instance)
         return serializer.data
 
 
 
 class TagSerializer(serializers.ModelSerializer):
-    
-# сериализатор для всех полей
+    """Cериализатор для тегов."""
+
     class Meta:
         model = Tag
         fields = '__all__'
-        # fields = ('name', 'color', 'slug',
-        #           'created', 'updated', )
 
 
 class GetRecipeSerializer(serializers.ModelSerializer):
-# получение списка рецептов, только для чтения
+    """Сериализатор для получения списка рецептов, только для чтения."""
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(
         many=True,
@@ -133,7 +125,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
-    """Создание рецепта."""
+    """Сериализатор для создания рецепта."""
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
@@ -148,7 +140,8 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
-                  'name', 'image', 'text', 'cooking_time', )
+                  'name', 'image', 'text', 'cooking_time',
+        )
     
     def validate(self, object):
         if not object.get('tags'):
@@ -166,7 +159,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             )
         if not object.get('cooking_time'):
             raise serializers.ValidationError(
-                'Укажите время приготовления')
+                'Укажите время приготовления.')
         return object
 
     def many_to_many_tag_ingredients(self, recipe, tags, ingredients):
@@ -180,7 +173,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        """создает новый объект рецепта"""
+        """Создает новый объект рецепта."""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         author = self.context.get('request').user
@@ -189,6 +182,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
+        """Обновляет объект рецепта."""
         tags = validated_data.pop('tags')
         RecipeIngredientAmount.objects.filter(recipe=instance).delete()
         ingredients = validated_data.pop('ingredients')
@@ -202,6 +196,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Сериализатор для списка покупок."""
     is_in_shopping_cart = serializers.SerializerMethodField('get_is_in_shopping_cart')
 
     def get_is_in_shopping_cart(self, validated_data):
@@ -219,7 +214,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-# избранное
+    """Сериализатор для избранного."""
     class Meta:
         model = Favorite
         fields = ('user', 'recipe', )

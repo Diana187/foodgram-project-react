@@ -7,7 +7,7 @@ from users.models import User
 
 
 class IngredientFilter(f.SearchFilter):
-# фильтр для ингредиентов: поиск по названию
+    """Фильтр для ингредиентов: поиск по названию"""
     search_param = 'name'
 
     class Meta:
@@ -16,9 +16,9 @@ class IngredientFilter(f.SearchFilter):
 
 
 class RecipeFilter(FilterSet):
-# класс фильтра для модели Recipe. Позволяет производить поиск рецептов
-# по тегам, автору, наличию в списке избранного и корзине покупок.
-
+    """Класс фильтра для модели Recipe. Позволяет производить
+    поиск рецептов по тегам, автору, наличию в списке
+    избранного и корзине покупок."""
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
@@ -27,9 +27,6 @@ class RecipeFilter(FilterSet):
     author =filters.ModelChoiceFilter(
         queryset=User.objects.all(),
     )
-    # AllValuesMultipleFilter ?
-    # NumberFilter ?
-    
     is_favorited = filters.BooleanFilter(
         method='filter_is_favorited'
     )

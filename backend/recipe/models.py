@@ -6,6 +6,7 @@ from users.models import User
 
 
 class Ingredient(models.Model):
+    """Модель для ингредиентов."""
     name = models.CharField(
         'Название ингредиента',
         db_index=True,
@@ -34,6 +35,7 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
+    """Модель для тегов."""
     name = models.CharField(
         'Название тега',
         db_index=True,
@@ -70,6 +72,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    """Модель рецептов."""
     author = models.ForeignKey(
         User,
         verbose_name='Автор рецепта',
@@ -96,14 +99,12 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингредиенты',
-        # related_name='recipes',
         through='RecipeIngredientAmount',
     )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Теги рецептов',
         related_name='recipes',
-        # ? а нужна последняя строчка??
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
@@ -160,6 +161,7 @@ class FavoriteShoppingList(models.Model):
 
 
 class ShoppingCart(FavoriteShoppingList):
+    """Модель списка покупок."""
 
     class Meta(FavoriteShoppingList.Meta):
         default_related_name = 'shopping_cart'
@@ -168,6 +170,7 @@ class ShoppingCart(FavoriteShoppingList):
 
 
 class Favorite(FavoriteShoppingList):
+    """Модель избранного."""
 
     class Meta(FavoriteShoppingList.Meta):
         default_related_name = 'favorites'
@@ -176,10 +179,10 @@ class Favorite(FavoriteShoppingList):
 
 
 class RecipeIngredientAmount(models.Model):
+    """Модель количества ингредиентов в рецепте."""
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        # related_name='ingredients',
         verbose_name='Ингредиент',
     )
     recipe = models.ForeignKey(

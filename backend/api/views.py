@@ -18,9 +18,9 @@ from recipe.models import (Favorite, Ingredient, Recipe,
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-# ViewSet для модели Ingredient.
-# Предоставляет возможности получения списка
-# и детальной информации об ингредиентах
+    """Вьюсет для ингредиентов.
+    Предоставляет возможность получения списка
+    и детальной информации об ингредиентах."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
@@ -29,14 +29,14 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ModelViewSet):
-#ViewSet для модели Tag.
+    """Вьюсет для тегов."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """ViewSet для модели Recipe. Предоставляет возможности просмотра,
+    """Вьюсет для модели Recipe. Предоставляет возможности просмотра,
     создания, изменения и удаления рецептов.
     Позволяет добавлять/удалять рецепты из избранного
     Добавлять/удалять рецепт из списка покупок
@@ -76,7 +76,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     
     @staticmethod
     def send_file(ingredients):
-#  Выгружает ингредиенты из списка покупок в файл shopping_list.txt
+        """Выгружает ингредиенты из списка покупок в файл shopping_list.txt."""
         shopping_list = 'Купить:'
         for ingredient in ingredients:
             shopping_list += (
@@ -95,7 +95,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
-# формирует список покупок из ингредиентов рецепта, считает количество ингредиентов
+        """Формирует список покупок из ингредиентов рецепта,
+        считает количество ингредиентов."""
         user = request.user
         if not user.shopping_cart.exists():
             return Response(
@@ -116,7 +117,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path='shopping_cart',
     )
     def shopping_cart(self, request, pk=None):
-        """добавляет и удаляет рецепт из списа покупок"""
+        """Добавляет и удаляет рецепт из списа покупок."""
         user=request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         data = {
@@ -142,7 +143,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED
             )
-        if request.method == "DELETE":
+        if request.method == 'DELETE':
             if not shopping_list:
                 return Response(
                     {'errors': 'Этого рецепта нет в списке покупок.'},
@@ -159,7 +160,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path='favorite'
     )
     def favorite(self, request, pk):
-# добавляет и удаляет рецепт из избранного
+        """Добавляет и удаляет рецепт из избранного."""
         user=request.user.id
         recipe = get_object_or_404(Recipe, id=pk)
         data = {

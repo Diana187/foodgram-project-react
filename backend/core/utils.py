@@ -7,7 +7,6 @@ from recipe.models import Recipe
 
 
 class Base64ImageField(serializers.ImageField):
-# картинка
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -15,13 +14,3 @@ class Base64ImageField(serializers.ImageField):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
-
-# #  нужен?
-# class RecipeSimpleSerializer(serializers.ModelSerializer):
-#     """Сериализатор для уменьшенного представления рецепта"""
-#     image = Base64ImageField
-
-#     class Meta:
-#         model = Recipe
-#         fields = ('id', 'name',
-#                   'image', 'cooking_time',)
