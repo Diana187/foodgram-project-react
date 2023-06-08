@@ -1,9 +1,9 @@
 from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
+from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
@@ -11,8 +11,7 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import RecipePagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
-                             GetRecipeSerializer, IngredientSerializer,
-                             ShoppingCartSerializer, TagSerializer)
+                             IngredientSerializer, ShoppingCartSerializer, TagSerializer)
 from recipe.models import (Favorite, Ingredient, Recipe,
                            RecipeIngredientAmount, ShoppingCart, Tag)
 
@@ -48,7 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     filterset_fields = ('tags',)
     permission_classes = (IsAuthorOrReadOnly, )
-    
+
     def get_serializer_class(self):
         if self.action == 'favorite' or self.action == 'shopping_cart':
             return FavoriteSerializer
@@ -73,7 +72,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context.update({'request': self.request})
         return context
-    
+
     @staticmethod
     def send_file(ingredients):
         """Выгружает ингредиенты из списка покупок в файл shopping_list.txt."""
@@ -118,7 +117,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, pk=None):
         """Добавляет и удаляет рецепт из списа покупок."""
-        user=request.user
+        user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         data = {
             'user': user.pk,
@@ -148,11 +147,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'errors': 'Этого рецепта нет в списке покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
-            )
+                )
             ShoppingCart.objects.get(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+
     @action(
         methods=['post', 'delete'],
         detail=True,
@@ -161,7 +160,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk):
         """Добавляет и удаляет рецепт из избранного."""
-        user=request.user.id
+        user = request.user.id
         recipe = get_object_or_404(Recipe, id=pk)
         data = {
             'user': user,
@@ -185,7 +184,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'errors': 'Этого рецепта нет в избранном.'},
                     status=status.HTTP_400_BAD_REQUEST
-            )
+                )
             Favorite.objects.get(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
