@@ -1,13 +1,9 @@
-from django.contrib.auth.hashers import make_password
-# from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
-from djoser.serializers import (SetPasswordSerializer, UserCreateSerializer,
-                                UserSerializer)
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers, validators
 from rest_framework.fields import SerializerMethodField
 
-# from core.utils import RecipeSimpleSerializer
 from recipe.models import Recipe
 from users.models import Follow, User
 
@@ -31,12 +27,15 @@ class CustomUserSerializer(UserSerializer):
             return False
         return obj.following.filter(user=request.user).exists()
 
+
 class CreateUserSerializer(UserCreateSerializer):
     """Сериализатор для создания пользователя."""
 
     class Meta(UserCreateSerializer.Meta):
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
+        fields = (
+            'email', 'id', 'username',
+            'first_name', 'last_name', 'password', )
         extra_kwargs = {'password': {'write_only': True}}
 
 
@@ -49,7 +48,7 @@ class FollowRecipeSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'image',
-            'cooking_time'
+            'cooking_time',
         )
 
 
@@ -58,17 +57,19 @@ class GetFollowSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    
+
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request.user.is_anonymous:
             return False
         follow = Follow.objects.filter(following=obj, user=request.user)
         return follow.exists()
-    
+
     def get_recipes_count(self, author):
         """Количество рецептов в виде целого числа."""
-        amount =  Recipe.objects.filter(author=author).aggregate(count=Count('id'))
+        amount = (
+            Recipe.objects.filter(author=author).aggregate(count=Count('id'))
+        )
         return amount['count']
 
     def get_recipes(self, obj):
@@ -84,7 +85,7 @@ class GetFollowSerializer(serializers.ModelSerializer):
             context={'request': request}
         )
         return serializer.data
-    
+
     class Meta:
         model = User
         fields = ('id', 'email', 'username',
@@ -97,7 +98,7 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ('user', 'following', )
-    
+
     def validate_following(self, data):
         if self.context.get('request').user == data:
             raise serializers.ValidationError('Нельзя подписаться на себя.')
