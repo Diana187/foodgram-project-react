@@ -18,7 +18,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
     """Сериализатор для связи ингредиентов и рецепта."""
     id = serializers.ReadOnlyField(
-        source = 'ingredient.id'
+        source='ingredient.id',
     )
     name = serializers.ReadOnlyField(
         source='ingredient.name',
@@ -31,12 +31,12 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
         model = RecipeIngredientAmount
         fields = (
             'id', 'name',
-            'measurement_unit', 
+            'measurement_unit',
             'amount',
         )
 
 
-class CreateRecipeIngredientAmountSerializerSerializer(serializers.ModelSerializer):
+class CreateRecipeIngredientAmountSerializer(serializers.ModelSerializer):
     """Сериализатор для создания рецепта."""
     id = serializers.IntegerField(write_only=True)
 
@@ -47,7 +47,6 @@ class CreateRecipeIngredientAmountSerializerSerializer(serializers.ModelSerializ
     def to_representation(self, instance):
         serializer = RecipeIngredientAmountSerializer(instance)
         return serializer.data
-
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -74,11 +73,10 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
-
     class Meta:
         model = Recipe
         fields = (
-            'id', 'name',  'text', 'tags',
+            'id', 'name', 'text', 'tags',
             'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'image', 'cooking_time',
         )
@@ -86,7 +84,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
         )
-    
+
     def get_is_favorited(self, object):
         """Возвращает True, если рецепт находится в избранном,
         в противном случае возвращает False."""
@@ -96,7 +94,6 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
 
-    
         favorite = Favorite.objects.filter(
             user=user,
             recipe=object,
@@ -104,7 +101,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if favorite.exists():
             return True
         return False
-    
+
     def get_is_in_shopping_cart(self, object):
         """Возвращает True, если рецепт находится в списке покупок,
         в противном случае возвращает False."""
@@ -112,7 +109,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
 
         if user.is_anonymous:
             return False
-    
+
         shopping_cart = ShoppingCart.objects.filter(
             user=user,
             recipe=object,
@@ -122,7 +119,6 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         return False
 
 
-
 class CreateRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для создания рецепта."""
     tags = serializers.PrimaryKeyRelatedField(
@@ -130,7 +126,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         many=True,
     )
     author = CustomUserSerializer(read_only=True)
-    ingredients = CreateRecipeIngredientAmountSerializerSerializer(
+    ingredients = CreateRecipeIngredientAmountSerializer(
         many=True,
     )
     image = Base64ImageField(required=False, allow_null=True)
@@ -140,8 +136,8 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
                   'name', 'image', 'text', 'cooking_time',
-        )
-    
+                  )
+
     def validate(self, object):
         if not object.get('tags'):
             raise serializers.ValidationError(
@@ -196,12 +192,14 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
     """Сериализатор для списка покупок."""
-    is_in_shopping_cart = serializers.SerializerMethodField('get_is_in_shopping_cart')
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        'get_is_in_shopping_cart'
+    )
 
     def get_is_in_shopping_cart(self, validated_data):
         shopping_cart = ShoppingCart.objects.filter(
-                user=validated_data.user,
-                recipe=validated_data.recipe,
+            user=validated_data.user,
+            recipe=validated_data.recipe,
         )
         if shopping_cart.exists():
             return True
