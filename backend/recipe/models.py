@@ -153,9 +153,9 @@ class FavoriteShoppingList(models.Model):
             models.UniqueConstraint(
                 fields=['recipe', 'user'],
                 name='%(app_label)s_%(class)s_unique',
-                ),
+            ),
         )
-    
+
     def __str__(self) -> str:
         return f'{self.user} add {self.recipe} in favorite.'
 
