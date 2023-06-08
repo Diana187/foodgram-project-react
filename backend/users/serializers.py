@@ -2,17 +2,15 @@ from django.contrib.auth.hashers import make_password
 # from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
+from djoser.serializers import (SetPasswordSerializer, UserCreateSerializer,
+                                UserSerializer)
 from rest_framework import serializers, validators
-
-from djoser.serializers import UserCreateSerializer, SetPasswordSerializer
+from rest_framework.fields import SerializerMethodField
 
 # from core.utils import RecipeSimpleSerializer
 from recipe.models import Recipe
-from users.models import User, Follow
+from users.models import Follow, User
 
-from users.models import User
-from djoser.serializers import UserSerializer
-from rest_framework.fields import SerializerMethodField
 
 class CustomUserSerializer(UserSerializer):
     """отображение пользователя

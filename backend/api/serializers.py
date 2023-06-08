@@ -2,10 +2,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
 from core.utils import Base64ImageField
-from users.serializers import CustomUserSerializer
-from recipe.models import Favorite, Ingredient, Recipe, RecipeIngredientAmount, Tag, ShoppingCart
 # from core.utils import RecipeSimpleSerializer
-from recipe.models import RecipeIngredientAmount
+from recipe.models import (Favorite, Ingredient, Recipe,
+                           RecipeIngredientAmount, ShoppingCart, Tag)
+from users.serializers import CustomUserSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):

@@ -1,17 +1,18 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, SAFE_METHODS
+from rest_framework.permissions import (SAFE_METHODS, AllowAny,
+                                        IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
 from api.pagination import RecipePagination
-from users.models import Follow
-from users.serializers import ( CustomUserSerializer, GetFollowSerializer,
-                               FollowSerializer, CreateUserSerializer)
+from users.models import Follow, User
+from users.serializers import (CreateUserSerializer, CustomUserSerializer,
+                               FollowSerializer, GetFollowSerializer)
 
-from users.models import User
-from djoser.views import UserViewSet
 
 class UserViewSet(UserViewSet):
     """вьюсет для пользователя """
