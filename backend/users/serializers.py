@@ -13,8 +13,8 @@ from users.models import Follow, User
 
 
 class CustomUserSerializer(UserSerializer):
-    """отображение пользователя
-    возвращает поле 'is_subscribed',показывающее,
+    """Сериализатор для отображения пользователя,
+    возвращает поле 'is_subscribed', показывающее,
     подписан ли текущий пользователь на другого."""
     is_subscribed = SerializerMethodField(read_only=True)
 
@@ -32,6 +32,8 @@ class CustomUserSerializer(UserSerializer):
         return obj.following.filter(user=request.user).exists()
 
 class CreateUserSerializer(UserCreateSerializer):
+    """Сериализатор для создания пользователя."""
+
     class Meta(UserCreateSerializer.Meta):
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', )
@@ -39,7 +41,8 @@ class CreateUserSerializer(UserCreateSerializer):
 
 
 class FollowRecipeSerializer(serializers.ModelSerializer):
-    
+    """Сериализатор подписок."""
+
     class Meta:
         model = Recipe
         fields = (
@@ -51,7 +54,7 @@ class FollowRecipeSerializer(serializers.ModelSerializer):
 
 
 class GetFollowSerializer(serializers.ModelSerializer):
-    """выводит список подписок пользователя"""
+    """Сериализатор для показа списока подписок пользователя."""
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
@@ -64,7 +67,7 @@ class GetFollowSerializer(serializers.ModelSerializer):
         return follow.exists()
     
     def get_recipes_count(self, author):
-        """количество рецептов в виде целого числа"""
+        """Количество рецептов в виде целого числа."""
         amount =  Recipe.objects.filter(author=author).aggregate(count=Count('id'))
         return amount['count']
 
@@ -90,7 +93,7 @@ class GetFollowSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    """сериализатор создания подписки"""
+    """Cериализатор создания подписки."""
     class Meta:
         model = Follow
         fields = ('user', 'following', )

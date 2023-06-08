@@ -7,6 +7,8 @@ from django.dispatch import receiver
 
 
 class User(AbstractUser):
+    """Модель пользователя."""
+
     first_name = models.CharField(
         'Имя',
         max_length=200,
@@ -38,6 +40,7 @@ class User(AbstractUser):
 
 
 class Follow(models.Model):
+    """Модель подписки."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

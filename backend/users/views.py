@@ -15,7 +15,7 @@ from users.serializers import (CreateUserSerializer, CustomUserSerializer,
 
 
 class UserViewSet(UserViewSet):
-    """вьюсет для пользователя """
+    """Вьюсет пользователя."""
     queryset = User.objects.all()
     permission_classes = (AllowAny, )
     pagination_class = RecipePagination
@@ -27,7 +27,7 @@ class UserViewSet(UserViewSet):
         pagination_class = (RecipePagination, )
     )
     def me(self, request):
-        """возвращает данные пользователя"""
+        """Возвращает данные пользователя."""
         return Response(
             self.get_serializer(request.user).data,
             status=status.HTTP_200_OK,
@@ -39,7 +39,8 @@ class UserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscriptions(self, request):
-        """список пользователей, на которых подписан"""
+        """Возвращает список пользователей,
+        на которых подписан автор."""
         user = request.user
         queryset = User.objects.filter(following__user=user)
         pages = self.paginate_queryset(queryset)
@@ -56,7 +57,7 @@ class UserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated, )
     )
     def subscribe(self, request, **kwargs):
-        """подписывает или отписывает автора на другого пользователя"""
+        """Создаёт или удаляет подписку автора на другого пользователя."""
         user = request.user
         author = get_object_or_404(User, id=kwargs['id'])
         data={
@@ -75,7 +76,7 @@ class UserViewSet(UserViewSet):
         if request.method == 'POST':
             if following.exists():
                 return Response(
-                    {'errors': 'Нельзя повторно подписаться на автора.'},
+                    {'errors': 'Нельзя повторно подписаться на пользователя.'},
                     status=status.HTTP_400_BAD_REQUEST)
             serializer = FollowSerializer(
                 data=data,

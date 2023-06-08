@@ -7,7 +7,7 @@ from users.models import User
 
 
 class IngredientFilter(f.SearchFilter):
-    """Фильтр для ингредиентов: поиск по названию"""
+    """Фильтр для ингредиентов: поиск по названию."""
     search_param = 'name'
 
     class Meta:
