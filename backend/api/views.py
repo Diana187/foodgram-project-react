@@ -13,6 +13,7 @@ from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
                              IngredientSerializer, ShoppingCartSerializer,
                              TagSerializer)
+from core.utils import check_and_delete_item
 from recipe.models import (Favorite, Ingredient, Recipe,
                            RecipeIngredientAmount, ShoppingCart, Tag)
 
@@ -107,7 +108,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shopping_cart__user=user
         ).order_by('ingredient__name').values(
             'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(amount=Sum('amount'))
+        ).annotate(amount=Sum('quantity'))
         return self.send_file(ingredients)
 
     @action(
@@ -144,13 +145,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 serializer.data, status=status.HTTP_201_CREATED
             )
         if request.method == 'DELETE':
-            if not shopping_list:
-                return Response(
-                    {'errors': 'Этого рецепта нет в списке покупок.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            ShoppingCart.objects.get(user=user, recipe=recipe).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return check_and_delete_item(
+                user, recipe, ShoppingCart, 'Этого рецепта нет в списке покупок.'
+            )
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
@@ -181,11 +178,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED)
         if request.method == "DELETE":
-            if not Favorite.objects.filter(user=user, recipe=recipe):
-                return Response(
-                    {'errors': 'Этого рецепта нет в избранном.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Favorite.objects.get(user=user, recipe=recipe).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return check_and_delete_item(
+                user, recipe, Favorite, 'Этого рецепта нет в избранном.'
+            )
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
