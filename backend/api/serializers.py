@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
 from core.utils import Base64ImageField
@@ -84,7 +83,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
         )
-    
+
     def get_is_favorited(self, object):
         """Возвращает True, если рецепт находится в избранном,
         в противном случае возвращает False."""
@@ -92,9 +91,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return Favorite.objects.filter(
-        user=user,
-        recipe=object
-    ).exists()
+            user=user,
+            recipe=object
+        ).exists()
 
     def get_is_in_shopping_cart(self, object):
         """Возвращает True, если рецепт находится в списке покупок,
@@ -104,9 +103,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-        user=user,
-        recipe=object
-    ).exists()
+            user=user,
+            recipe=object
+        ).exists()
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
@@ -165,7 +164,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             ) for ingredient in ingredients]
         )
 
-
     def create(self, validated_data):
         """Создает новый объект рецепта."""
         tags = validated_data.pop('tags')
@@ -194,12 +192,12 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField(
         'get_is_in_shopping_cart'
     )
-    
+
     def get_is_in_shopping_cart(self, validated_data):
         return ShoppingCart.objects.filter(
-        user=validated_data.user,
-        recipe=validated_data.recipe
-    ).exists()
+            user=validated_data.user,
+            recipe=validated_data.recipe
+        ).exists()
 
     class Meta:
         model = ShoppingCart

@@ -15,6 +15,7 @@ class Base64ImageField(serializers.ImageField):
 
         return super().to_internal_value(data)
 
+
 def check_and_delete_item(user, recipe, model_class, error_message):
     """Проверка наличия и удаления элемента для избранного и списка покупок."""
     if not model_class.objects.filter(user=user, recipe=recipe):

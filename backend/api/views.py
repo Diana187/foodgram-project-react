@@ -146,7 +146,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         if request.method == 'DELETE':
             return check_and_delete_item(
-                user, recipe, ShoppingCart, 'Этого рецепта нет в списке покупок.'
+                user, recipe, ShoppingCart,
+                'Этого рецепта нет в списке покупок.'
             )
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
