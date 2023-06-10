@@ -84,23 +84,17 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
         )
-
+    
     def get_is_favorited(self, object):
         """Возвращает True, если рецепт находится в избранном,
         в противном случае возвращает False."""
-
         user = self.context['request'].user
-
         if user.is_anonymous:
             return False
-
-        favorite = Favorite.objects.filter(
-            user=user,
-            recipe=object,
-        )
-        if favorite.exists():
-            return True
-        return False
+        return Favorite.objects.filter(
+        user=user,
+        recipe=object
+    ).exists()
 
     def get_is_in_shopping_cart(self, object):
         """Возвращает True, если рецепт находится в списке покупок,
@@ -109,14 +103,10 @@ class GetRecipeSerializer(serializers.ModelSerializer):
 
         if user.is_anonymous:
             return False
-
-        shopping_cart = ShoppingCart.objects.filter(
-            user=user,
-            recipe=object,
-        )
-        if shopping_cart.exists():
-            return True
-        return False
+        return ShoppingCart.objects.filter(
+        user=user,
+        recipe=object
+    ).exists()
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
@@ -152,6 +142,14 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Должен быть указан хотя бы один ингредиент.'
             )
+        ingredient_set = set()
+        for ingredient in object.get('ingredients'):
+            ingredient_id = ingredient.get('id')
+            if ingredient_id in ingredient_set:
+                raise serializers.ValidationError(
+                    'Найден дубликат ингредиента.'
+                )
+            ingredient_set.add(ingredient_id)
         if not object.get('cooking_time'):
             raise serializers.ValidationError(
                 'Укажите время приготовления.')
@@ -162,7 +160,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         RecipeIngredientAmount.objects.bulk_create(
             [RecipeIngredientAmount(
                 recipe=recipe,
-                ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
+                ingredient=get_object_or_404(
+                    Ingredient, ingredient_id=ingredient['id'],
+                ),
                 amount=ingredient['amount']
             ) for ingredient in ingredients]
         )
@@ -195,15 +195,12 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField(
         'get_is_in_shopping_cart'
     )
-
+    
     def get_is_in_shopping_cart(self, validated_data):
-        shopping_cart = ShoppingCart.objects.filter(
-            user=validated_data.user,
-            recipe=validated_data.recipe,
-        )
-        if shopping_cart.exists():
-            return True
-        return False
+        return ShoppingCart.objects.filter(
+        user=validated_data.user,
+        recipe=validated_data.recipe
+    ).exists()
 
     class Meta:
         model = ShoppingCart
