@@ -85,11 +85,11 @@ class UserViewSet(UserViewSet):
                 status=status.HTTP_201_CREATED
             )
         if request.method == 'DELETE':
-            if not Follow.objects.filter(user=user, following=author):
-                return Response(
-                    {'errors': 'У вас нет такой подписки.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # if not Follow.objects.filter(user=user, following=author):
+            #     return Response(
+            #         {'errors': 'У вас нет такой подписки.'},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             Follow.objects.get(user=user, following=author).delete()
             return Response(
                 {'detail': 'Подписка отменена.'},
