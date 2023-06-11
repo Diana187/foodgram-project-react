@@ -84,9 +84,12 @@ class UserViewSet(UserViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-        if request.method == 'DELETE':
-            Follow.objects.get(user=user, following=author).delete()
-            return Response(
-                {'detail': 'Подписка отменена.'},
-                status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        if not following.exists(): 
+            return Response( 
+                {'errors': 'У вас нет такой подписки.'}, 
+                status=status.HTTP_400_BAD_REQUEST 
+            ) 
+        following.delete()
+        return Response(
+            {'detail': 'Подписка отменена.'},
+            status=status.HTTP_204_NO_CONTENT)
