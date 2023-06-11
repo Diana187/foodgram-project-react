@@ -29,14 +29,12 @@ services:
       - ../.env
   backend:
     image: foodgram_backend
-    ports:
-      - "8000:8000"
     build: ../backend
     env_file: ../.env
     volumes:
       - static:/app/static
       - media:/app/media
-      - "../backend:/app:rw"
+      # - "../backend:/app:rw"
     depends_on:
       - db
 
