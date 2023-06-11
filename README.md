@@ -17,7 +17,6 @@ http://51.250.77.38/
 - ![image] (https://img.shields.io/badge/-Docker%20compose-464646?style=flat&logo=Docker&logoColor=56C0C0&color=008080)
 - ![image] (https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 - ![image] (https://img.shields.io/badge/gunicorn-blue?logo=gunicorn&logoColor=white)
-- ![yamdb_workflow](https://github.com/Diana187/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
 
 
 ## Установка
