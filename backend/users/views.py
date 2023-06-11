@@ -84,11 +84,11 @@ class UserViewSet(UserViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-        if not following.exists(): 
-            return Response( 
-                {'errors': 'У вас нет такой подписки.'}, 
-                status=status.HTTP_400_BAD_REQUEST 
-            ) 
+        if not following.exists():
+            return Response(
+                {'errors': 'У вас нет такой подписки.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         following.delete()
         return Response(
             {'detail': 'Подписка отменена.'},

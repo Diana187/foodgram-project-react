@@ -112,7 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.send_file(ingredients)
 
     def add_or_delete_recipe(self,
-                             request, 
+                             request,
                              user,
                              recipe,
                              model_class,
