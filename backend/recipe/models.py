@@ -176,7 +176,6 @@ class ShoppingCart(FavoriteShoppingList):
         )
 
 
-
 class Favorite(FavoriteShoppingList):
     """Модель избранного."""
 
