@@ -152,7 +152,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         if not object.get('cooking_time'):
             raise serializers.ValidationError(
                 'Укажите время приготовления.')
-        if object['cooking_time'] < 0:
+        if object['cooking_time'] <= 0:
             raise serializers.ValidationError({
                 'Время приготовления не может быть отрицательным.'
             })
