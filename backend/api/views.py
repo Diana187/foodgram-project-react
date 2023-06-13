@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -16,6 +17,7 @@ from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
 from core.utils import check_and_delete_item
 from recipe.models import (Favorite, Ingredient, Recipe,
                            RecipeIngredientAmount, ShoppingCart, Tag)
+
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -49,6 +51,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     filterset_fields = ('tags',)
     permission_classes = (IsAuthorOrReadOnly, )
+    pagination_class.page_size = 6
 
     def get_serializer_class(self):
         if self.action == 'favorite' or self.action == 'shopping_cart':
