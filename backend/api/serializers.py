@@ -152,12 +152,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         if not object.get('cooking_time'):
             raise serializers.ValidationError(
                 'Укажите время приготовления.')
-        if object['cooking_time'] < 0:
-            raise serializers.ValidationError({
-                'cooking_time': 'Время приготовления должно быть неотрицательным!'
-            })
         return object
-        
 
     def many_to_many_tag_ingredients(self, recipe, tags, ingredients):
         recipe.tags.set(tags)
