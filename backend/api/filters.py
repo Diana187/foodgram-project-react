@@ -1,8 +1,7 @@
 from django_filters import FilterSet
 from django_filters import rest_framework as filters
-from rest_framework import filters as f
-
 from recipe.models import Ingredient, Recipe, Tag
+from rest_framework import filters as f
 from users.models import User
 
 

@@ -1,10 +1,9 @@
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
+from recipe.models import Recipe
 from rest_framework import serializers, validators
 from rest_framework.fields import SerializerMethodField
-
-from recipe.models import Recipe
 from users.models import Follow, User
 
 

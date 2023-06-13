@@ -1,8 +1,7 @@
-from rest_framework import serializers, validators
-
 from core.utils import Base64ImageField
 from recipe.models import (Favorite, Ingredient, Recipe,
                            RecipeIngredientAmount, ShoppingCart, Tag)
+from rest_framework import serializers, validators
 from users.serializers import CustomUserSerializer
 
 
@@ -156,7 +155,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'Время приготовления не может быть отрицательным.'
             })
-        
         return object
 
     def many_to_many_tag_ingredients(self, recipe, tags, ingredients):
